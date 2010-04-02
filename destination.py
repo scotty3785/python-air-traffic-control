@@ -14,6 +14,6 @@ class Destination:
         self.font_img = font.render(text, True, Config.DEST_COLOR)
 
     def draw(self, surface):
-        pygame.draw.circle(surface, Config.DEST_COLOR, self.location, 2, 0)
+        pygame.draw.circle(surface, Config.DEST_COLOR, self.location, 5, 0)
         surface.blit(self.font_img, (self.location[0] + 8, self.location[1] + 8))
         

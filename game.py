@@ -21,7 +21,9 @@ class Game:
 		self.obstacles = []
 		self.destinations = []
 		self.aircraftspawns = []
-		self.__generateDestinations()
+		self.destinations.append(Destination(400, 400, "DME"))
+		self.destinations.append(Destination(600, 200, "VOR"))
+		#self.__generateDestinations()
 		self.__generateAircraftSpawnEvents()
 
     def start(self):
@@ -31,8 +33,9 @@ class Game:
         #The main game loop
         while gameEnd == 0:
             timepassed = clock.tick(Config.FRAMERATE)
-            print(i)
-            i += 1
+
+            for x in self.destinations:
+                x.draw(self.screen)
 
             self.__update()
             #self.__checkForUserInteraction()
@@ -40,7 +43,6 @@ class Game:
             #Recalc time
             self.ms_elapsed = self.ms_elapsed + timepassed
             if((self.ms_elapsed / 1000) >= Config.GAMETIME):
-                print("time up!")
                 gameEnd = 1
                 
             #Flip the framebuffers
@@ -55,7 +57,7 @@ class Game:
         for a in self.aircraft:
 			#Update positions and redraw
 			x.update()
-			x.draw()
+			x.draw(self.screen)
 			#Check collisions
 			for o in self.obstacles:
 				self.__handleCollision(a, o)

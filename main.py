@@ -2,7 +2,8 @@
 #   Author: Tom Woolfrey
 
 from pygame import *;
-import game;
+from game import *;
+import os;
 
 class Main:
 
@@ -12,16 +13,15 @@ class Main:
         init()
         screen = display.set_mode((1024, 768))
         display.set_caption('ATC Version 0.1')
-        background = image.load('data/backdrop.png')
+        background = image.load(os.path.join('data', 'backdrop.png'))
         screen.blit(background, (0, 0))
 
-        self.game = game.Game(screen)
+        self.game = Game(screen)
 
     def run(self):
         #Display a menu
         #
         self.game.start()
-        pass
 
 if __name__ == '__main__':
     game_main = Main()
