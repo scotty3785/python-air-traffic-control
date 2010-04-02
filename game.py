@@ -14,18 +14,25 @@ class Game:
         self.screen = screen
         self.ms_elapsed = 0
         self.score = 0
+		self.aircraft = []
+
         self.__generateDestinations()
         self.__generateAircraftSpawnEvents()
 
     def start(self):
         clock = pygame.time.clock()
+		gameEnd = 0
 
         #The main game loop
-        while (self.ms_elapsed / 1000) < Config.GAMETIME:
+        while gameEnd == 0:
             timepassed = clock.tick(Config.FPS)
             self.ms_elapsed = self.ms_elapsed + timepassed
+
             self.__update()
             self.__checkForUserInteraction()
+
+			if((self.ms_elapsed / 1000) >= Config.GAMETIME):
+				gameEnd = 1
             
             
     def __update(self):
@@ -34,7 +41,11 @@ class Game:
         #2: Check if any aircraft have collided with an obstacle
         #3: Check if any aircraft have reached a destination
         #4: Spawn new aircraft
-        pass
+        for a in self.aircraft:
+			x.update()
+			x.draw()
+			for o in self.obstacles:
+				self.__checkCollision(a, o)
 
     def __updateAircraftPositions(self):
         for x in self.aircraft:
@@ -68,4 +79,6 @@ class Game:
             loc = (0, random.randint(-Game.AERIALPANE_H, 0))
         return loc
 
+	def __checkCollision(self, ac, obs):
+		if( 
 

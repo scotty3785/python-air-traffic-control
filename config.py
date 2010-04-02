@@ -8,6 +8,8 @@ class Config:
     NUMBEROFDESTINATIONS = 6;   #Number of destinations spawning during the game
     FRAMERATE = 40              #Framerate of the main game loop
 
+	MAX_WAYPOINTS = 6;
+
     #Difficulty HARD
     DH_AIRCRAFT = 20;           #Num aircraft
     DH_DEST = 12;               #Num destinations
