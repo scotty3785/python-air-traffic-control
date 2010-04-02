@@ -1,9 +1,12 @@
 #   File: game.py
 #   Description: An instance of one game of ATC
 
+import pygame;
 import random;
 from config import *;
 from destination import *;
+from aircraft import *;
+from aircraftspawnevent import *;
 
 class Game:
 
@@ -11,29 +14,37 @@ class Game:
     AERIALPANE_H = 768;
 
     def __init__(self, screen):
-        self.screen = screen
-        self.ms_elapsed = 0
-        self.score = 0
+		self.screen = screen
+		self.ms_elapsed = 0
+		self.score = 0
 		self.aircraft = []
-
-        self.__generateDestinations()
-        self.__generateAircraftSpawnEvents()
+		self.obstacles = []
+		self.destinations = []
+		self.aircraftspawns = []
+		self.__generateDestinations()
+		self.__generateAircraftSpawnEvents()
 
     def start(self):
-        clock = pygame.time.clock()
-		gameEnd = 0
-
+        clock = pygame.time.Clock()
+        gameEnd = 0
+        i = 0 
         #The main game loop
         while gameEnd == 0:
-            timepassed = clock.tick(Config.FPS)
-            self.ms_elapsed = self.ms_elapsed + timepassed
+            timepassed = clock.tick(Config.FRAMERATE)
+            print(i)
+            i += 1
 
             self.__update()
-            self.__checkForUserInteraction()
-
-			if((self.ms_elapsed / 1000) >= Config.GAMETIME):
-				gameEnd = 1
+            #self.__checkForUserInteraction()
             
+            #Recalc time
+            self.ms_elapsed = self.ms_elapsed + timepassed
+            if((self.ms_elapsed / 1000) >= Config.GAMETIME):
+                print("time up!")
+                gameEnd = 1
+                
+            #Flip the framebuffers
+            pygame.display.flip()
             
     def __update(self):
         #Things to do here:
@@ -42,29 +53,29 @@ class Game:
         #3: Check if any aircraft have reached a destination
         #4: Spawn new aircraft
         for a in self.aircraft:
+			#Update positions and redraw
 			x.update()
 			x.draw()
+			#Check collisions
 			for o in self.obstacles:
-				self.__checkCollision(a, o)
+				self.__handleCollision(a, o)
+			for a in self.aircraft:
+				self.__handleCollision(a, a)
 
-    def __updateAircraftPositions(self):
-        for x in self.aircraft:
-            #Do some shizzle
-            pass
 
     def __generateAircraftSpawnEvents(self):
         for x in range(0, Config.NUMBEROFAIRCRAFT):
             randtime = random.randint(1, Config.GAMETIME)
-            randspawn = __generateRandomSpawnPoint();
+            randspawn = self.__generateRandomSpawnPoint();
             randdest = random.randint(0, Config.NUMBEROFDESTINATIONS)
             spawnevent = AircraftSpawnEvent(randtime, randspawn, randdest)
-            self.aircraftspawns.append(spawn)
+            self.aircraftspawns.append(spawnevent)
 
     def __generateDestinations(self):
         for x in range(0, Config.NUMBEROFDESTINATIONS):
             randx = random.gammavariate( Game.AERIALPANE_W/2, Game.AERIALPANE_W/6 )
             randy = random.randint(-Game.AERIALPANE_H/2, Game.AERIALPANE_H/6)
-            dest = Destination(randx, randy)
+            dest = Destination(randx, randy, "D" + str(x))
             self.destinations.append(dest)
 
     def __generateRandomSpawnPoint(self):
@@ -79,6 +90,5 @@ class Game:
             loc = (0, random.randint(-Game.AERIALPANE_H, 0))
         return loc
 
-	def __checkCollision(self, ac, obs):
-		if( 
-
+	def __handleCollision(self, ac, obs):
+		pass
