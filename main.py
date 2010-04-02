@@ -10,7 +10,7 @@ class Main:
 
     def __init__(self):
         init()
-        screen = display.set_mode((400, 400))
+        screen = display.set_mode((1024, 768))
         display.set_caption('ATC Version 0.1')
         background = image.load('data/backdrop.png')
         screen.blit(background, (0, 0))
