@@ -2,6 +2,8 @@
 #   Description: An instance of one game of ATC
 
 import random;
+from config import *;
+from destination import *;
 
 class Game:
 
@@ -12,8 +14,8 @@ class Game:
         self.screen = screen
         self.ms_elapsed = 0
         self.score = 0
-        __generateDestinations()
-        __generateAircraftSpawnEvents()
+        self.__generateDestinations()
+        self.__generateAircraftSpawnEvents()
 
     def start(self):
         clock = pygame.time.clock()
@@ -22,8 +24,8 @@ class Game:
         while (self.ms_elapsed / 1000) < Config.GAMETIME:
             timepassed = clock.tick(Config.FPS)
             self.ms_elapsed = self.ms_elapsed + timepassed
-            __update()
-            __checkUserInteraction()
+            self.__update()
+            self.__checkForUserInteraction()
             
             
     def __update(self):
@@ -44,24 +46,26 @@ class Game:
             randtime = random.randint(1, Config.GAMETIME)
             randspawn = __generateRandomSpawnPoint();
             randdest = random.randint(0, Config.NUMBEROFDESTINATIONS)
-            spawn = spawn(randtime, randspawn, randdest)
+            spawnevent = AircraftSpawnEvent(randtime, randspawn, randdest)
             self.aircraftspawns.append(spawn)
 
     def __generateDestinations(self):
         for x in range(0, Config.NUMBEROFDESTINATIONS):
-            randx = random.gammavariate( AERIALPANE_W/2, AERIALPANE_W/6 )
-            randy = random.randint(-AERIALPANE_H/2, AERIALPANE_H/6)
-            dest = destination(randx, randy)
+            randx = random.gammavariate( Game.AERIALPANE_W/2, Game.AERIALPANE_W/6 )
+            randy = random.randint(-Game.AERIALPANE_H/2, Game.AERIALPANE_H/6)
+            dest = Destination(randx, randy)
             self.destinations.append(dest)
 
     def __generateRandomSpawnPoint(self):
         side = random.randint(1, 4)
         if side == 1:
-            loc = (random.randint(0, AERIALPANE_W), 0)
+            loc = (random.randint(0, Game.AERIALPANE_W), 0)
         elif side == 2:
-            loc = (AERIALPANE_W, random.randint(-AERIALPANE_H, 0))
+            loc = (Game.AERIALPANE_W, random.randint(-Game.AERIALPANE_H, 0))
         elif side == 3:
-            loc = (random.randint(0, AERIALPANE_W), -AERIALPANE_H)
+            loc = (random.randint(0, Game.AERIALPANE_W), -Game.AERIALPANE_H)
         elif side == 4:
-            loc = (0, random.randint(-AERIALPANE_H, 0))
+            loc = (0, random.randint(-Game.AERIALPANE_H, 0))
         return loc
+
+
