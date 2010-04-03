@@ -2,17 +2,20 @@
 
 import math;
 import pygame;
+import os;
 
 class Aircraft:
 
 	#Constructor!
     def __init__(self, location, speed, destination):
         self.location = location;
-        self.speed = 0
+        self.speed = speed
         self.waypoints = []
         self.waypoints.append(destination)
+        self.heading = self.__calculateHeading(self.location, self.waypoints[0].getLocation())
         self.image = pygame.image.load(os.path.join('data', 'aircraft.png'))
         self.image.convert_alpha()
+        self.image.set_colorkey((0,0,0))
         self.recta = self.image.get_rect()
 
 	#Add a new waypoint in the specified index in the list
@@ -30,46 +33,47 @@ class Aircraft:
 
 	#Draw myself on the screen at my current position and heading
     def draw(self, surface):
-        rot_image = pygame.transform.rotate(self.image, -self.heading)
-        self.recta.center = self.location
+        rot_image = pygame.transform.rotate(self.image, self.heading)
+        #self.recta.center = self.location
+        print(self.location)
         surface.blit(rot_image, self.location)
 
 	#Location/heading update function
-	def update(self):
-		if(self.__reachedWaypoint(self.location, self.waypoints[0])):
-			#Reached next waypoint, pop it
-			self.waypoints.pop()
-			if( len(self.waypoints) == 0):
-				#Reached destination, return True
-				return True
-			else:
-				#Not reached destination, return False
-				self.heading = self.__calculateHeading(self.location, self.waypoints[0])
-				return False
+    def update(self):
+        if(self.__reachedWaypoint(self.location, self.waypoints[0].getLocation())):
+            #Reached next waypoint, pop it
+            self.waypoints.pop()
+            if( len(self.waypoints) == 0):
+                #Reached destination, return True
+                return True
+            else:
+                self.heading = self.__calculateHeading(self.location, self.waypoints[0].getLocation())
 		
-		#Keep moving
-		self.location = self.__calcNewLocation(self.location)
+		#Keep moving towards waypoint
+        self.location = self.__calculateNewLocation(self.location, self.heading, self.speed)
+        return False
 
 	#Calculate heading based on current position and waypoint
-	def __calculateHeading(self, location, waypoint):
-		x_diff = waypoint[0] - location[0]
-		y_diff = waypoint[1] - location[1]
-		self.heading = math.degrees(math.atan2(x_diff, y_diff))
-		return heading
+    def __calculateHeading(self, location, waypoint):
+        x_diff = waypoint[0] - location[0]
+        y_diff = waypoint[1] - location[1]
+        heading = math.degrees(math.atan2(y_diff, x_diff) + (math.pi / 2))
+        print(str(heading))
+        return heading
 
 	#Calculate new location based on current location, heading and speed
-	def __calculateNewLocation(self, location, heading, speed):
-		x_diff = speed * math.cos(math.radians(heading))
-		y_diff = speed * math.sin(math.radians(heading))
-		location[0] += x_diff
-		location[1] += y_diff
+    def __calculateNewLocation(self, location, heading, speed):
+        x_diff = speed * math.cos(math.radians(heading))
+        y_diff = speed * math.sin(math.radians(heading))
+        location = (location[0] + x_diff, location[1] + y_diff)
+        return location
 
 	#Check whether I have reached the given waypoint
-	def __reachedWaypoint(self, location, waypoint):
-		x = (location[0] - waypoint[0])**2
-		y = (location[1] - waypoint[1])**2
-		distance = math.sqrt(x+y)
-		if distance < 5:
-			return True
-		else:
-			return False
+    def __reachedWaypoint(self, location, waypoint):
+        x = (location[0] - waypoint[0])**2
+        y = (location[1] - waypoint[1])**2
+        distance = math.sqrt(x+y)
+        if distance < 5:
+            return True
+        else:
+            return False

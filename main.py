@@ -13,8 +13,6 @@ class Main:
         init()
         screen = display.set_mode((1024, 768))
         display.set_caption('ATC Version 0.1')
-        background = image.load(os.path.join('data', 'backdrop.png'))
-        screen.blit(background, (0, 0))
 
         self.game = Game(screen)
 

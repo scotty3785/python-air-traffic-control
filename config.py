@@ -3,7 +3,7 @@
 
 class Config:
 
-    GAMETIME = 180;             #Game length in seconds
+    GAMETIME = 180000;          #Game length in milliseconds
     NUMBEROFAIRCRAFT = 10;      #Number of aircraft spawning during the game
     NUMBEROFDESTINATIONS = 6;   #Number of destinations spawning during the game
     FRAMERATE = 40              #Framerate of the main game loop

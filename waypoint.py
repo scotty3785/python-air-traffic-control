@@ -6,7 +6,7 @@ class Waypoint:
 		self.location = location
 
 	def getLocation(self):
-		return location
+		return self.location
 
-	def setLocation(self, location)
+	def setLocation(self, location):
 		self.location = location

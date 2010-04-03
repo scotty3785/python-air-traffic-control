@@ -14,17 +14,16 @@ class Game:
     AERIALPANE_H = 768;
 
     def __init__(self, screen):
-		self.screen = screen
-		self.ms_elapsed = 0
-		self.score = 0
-		self.aircraft = []
-		self.obstacles = []
-		self.destinations = []
-		self.aircraftspawns = []
-		self.destinations.append(Destination(400, 400, "DME"))
-		self.destinations.append(Destination(600, 200, "VOR"))
-		#self.__generateDestinations()
-		self.__generateAircraftSpawnEvents()
+        self.background = pygame.image.load(os.path.join('data', 'backdrop.png'))
+        self.screen = screen
+        self.ms_elapsed = 0
+        self.score = 0
+        self.aircraft = []
+        self.obstacles = []
+        self.destinations = []
+        self.aircraftspawns = []
+        self.__generateDestinations()
+        self.__generateAircraftSpawnEvents()
 
     def start(self):
         clock = pygame.time.Clock()
@@ -34,6 +33,9 @@ class Game:
         while gameEnd == 0:
             timepassed = clock.tick(Config.FRAMERATE)
 
+            self.screen.blit(self.background, (0, 0))
+
+
             for x in self.destinations:
                 x.draw(self.screen)
 
@@ -42,7 +44,7 @@ class Game:
             
             #Recalc time
             self.ms_elapsed = self.ms_elapsed + timepassed
-            if((self.ms_elapsed / 1000) >= Config.GAMETIME):
+            if(self.ms_elapsed >= Config.GAMETIME):
                 gameEnd = 1
                 
             #Flip the framebuffers
@@ -56,28 +58,37 @@ class Game:
         #4: Spawn new aircraft
         for a in self.aircraft:
 			#Update positions and redraw
-			x.update()
-			x.draw(self.screen)
+			a.update()
+			a.draw(self.screen)
 			#Check collisions
-			for o in self.obstacles:
-				self.__handleCollision(a, o)
-			for a in self.aircraft:
-				self.__handleCollision(a, a)
+			#for o in self.obstacles:
+			#	self.__handleCollision(a, o)
+			#for a in self.aircraft:
+			#	self.__handleCollision(a, a)
+
+        for sp in self.aircraftspawns:
+            if self.ms_elapsed >= sp.getTime():
+                print("Time = " + str(self.ms_elapsed))
+                print(sp.getSpawnPoint())
+                ac = Aircraft(sp.getSpawnPoint(), 0.2, sp.getDestination())
+                self.aircraft.append(ac)
+                self.aircraftspawns.remove(sp)
 
 
     def __generateAircraftSpawnEvents(self):
         for x in range(0, Config.NUMBEROFAIRCRAFT):
             randtime = random.randint(1, Config.GAMETIME)
             randspawn = self.__generateRandomSpawnPoint();
-            randdest = random.randint(0, Config.NUMBEROFDESTINATIONS)
+            randdest = random.choice(self.destinations)
             spawnevent = AircraftSpawnEvent(randtime, randspawn, randdest)
             self.aircraftspawns.append(spawnevent)
+            print(str(spawnevent))
 
     def __generateDestinations(self):
         for x in range(0, Config.NUMBEROFDESTINATIONS):
-            randx = random.gammavariate( Game.AERIALPANE_W/2, Game.AERIALPANE_W/6 )
-            randy = random.randint(-Game.AERIALPANE_H/2, Game.AERIALPANE_H/6)
-            dest = Destination(randx, randy, "D" + str(x))
+            randx = random.randint( 20, Game.AERIALPANE_W - 20 )
+            randy = random.randint( 20, Game.AERIALPANE_H - 20 )
+            dest = Destination((randx, randy), "D" + str(x))
             self.destinations.append(dest)
 
     def __generateRandomSpawnPoint(self):
@@ -85,11 +96,11 @@ class Game:
         if side == 1:
             loc = (random.randint(0, Game.AERIALPANE_W), 0)
         elif side == 2:
-            loc = (Game.AERIALPANE_W, random.randint(-Game.AERIALPANE_H, 0))
+            loc = (Game.AERIALPANE_W, random.randint(0, Game.AERIALPANE_H))
         elif side == 3:
-            loc = (random.randint(0, Game.AERIALPANE_W), -Game.AERIALPANE_H)
+            loc = (random.randint(0, Game.AERIALPANE_W), Game.AERIALPANE_H)
         elif side == 4:
-            loc = (0, random.randint(-Game.AERIALPANE_H, 0))
+            loc = (0, random.randint(0, Game.AERIALPANE_H))
         return loc
 
 	def __handleCollision(self, ac, obs):
