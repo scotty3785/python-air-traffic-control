@@ -34,12 +34,22 @@ class Waypoint(pygame.sprite.Sprite):
 		self.pos = pygame.mouse.get_pos()
 		print "New waypoint inserted at:", self.pos
 		self.rect.center = self.pos
+		self.clicked = False
 
 	def update(self):
 		# Must change at least rect or image attribute to cause 
 		# sprite to be displayed
-		#self.rect.center = self.pos
-		pass
+		if self.clicked:
+			self.pos = pygame.mouse.get_pos()
+			self.rect.center = self.pos
+			pass
+
+	def click(self):
+		self.clicked = True
+
+	def unclick(self):
+		self.clicked = False
+
 
 def main():
     """this function is called when the program starts.
@@ -66,6 +76,8 @@ def main():
     clock = pygame.time.Clock()
 	# Create a group/container for all the waypoint sprites to be drawn
     waypoints = pygame.sprite.RenderUpdates()
+
+    all_waypoints = []
     
 #Main Loop
     while 1:
@@ -79,10 +91,20 @@ def main():
                 return
             elif event.type == MOUSEBUTTONDOWN:
 				# Check if clicked on an existing waypoint
+				sprites_clicked = [sprite for sprite in all_waypoints if sprite.rect.collidepoint(pygame.mouse.get_pos())]
+				print sprites_clicked
 				# If not, then create a new one
-				waypoints.add(Waypoint())
+				if (not sprites_clicked):
+					w = Waypoint()
+					waypoints.add(w)
+					all_waypoints.append(w)
+				else:
+					print "sprite already exists"
+					sprites_clicked[0].click()
             elif event.type == MOUSEBUTTONUP:
                 #fist.unpunch()
+				if (sprites_clicked):
+					sprites_clicked[0].unclick()
 				pass
 
         waypoints.update()
