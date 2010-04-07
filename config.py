@@ -31,4 +31,4 @@ class Config:
 
     AC_SPEED_DEFAULT = 0.5              #Aircraft starting speed
     AC_COLLISION_RADIUS = 30            #Aircraft collision radius (pixels)
-    AC_DRAW_COLLISION_RADIUS = False    #Draw collision radius?
+    AC_DRAW_COLLISION_RADIUS = True    #Draw collision radius?

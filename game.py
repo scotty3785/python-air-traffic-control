@@ -14,15 +14,23 @@ class Game:
     AERIALPANE_H = 768;
 
     def __init__(self, screen):
+        #Imagey type stuff
         self.background = pygame.image.load(os.path.join('data', 'backdrop.png'))
         self.font = pygame.font.Font(None, 30)
         self.screen = screen
+
+        #Game state vars
         self.ms_elapsed = 0
         self.score = 0
         self.aircraft = []
         self.obstacles = []
         self.destinations = []
         self.aircraftspawns = []
+
+        #UI vars
+        self.ac_selected = None
+
+        #Generations functions
         self.__generateDestinations()
         self.__generateObstacles()
         self.__generateAircraftSpawnEvents()
@@ -35,8 +43,8 @@ class Game:
         while gameEnd == 0:
             timepassed = clock.tick(Config.FRAMERATE)
 
-            #self.__checkForUserInteraction()
-
+            gameEnd = self.__handleUserInteraction()
+    
             #Draw background
             self.screen.blit(self.background, (0, 0))
 
@@ -92,6 +100,7 @@ class Game:
         for sp in self.aircraftspawns:
             if self.ms_elapsed >= sp.getTime():
                 ac = Aircraft(sp.getSpawnPoint(), Config.AC_SPEED_DEFAULT, sp.getDestination())
+                ac.addWaypoint((400, 400))
                 self.aircraft.append(ac)
                 self.aircraftspawns.remove(sp)
 
@@ -126,5 +135,14 @@ class Game:
             loc = (0, random.randint(0, Game.AERIALPANE_H))
         return loc
 
-	def __handleCollision(self, ac, obs):
-		pass
+    def __handleUserInteraction(self):
+        for event in pygame.event.get():
+           if(event.type == pygame.MOUSEBUTTONDOWN):
+                for ac in self.aircraft:
+                    if(ac.clickedOn(event.pos)):
+                        ac.setSelected(True)
+                        self.ac_selected = ac
+                    else:
+                        ac.setSelected(False)
+        return 0
+

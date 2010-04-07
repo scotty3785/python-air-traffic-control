@@ -19,7 +19,8 @@ class Main:
     def run(self):
         #Display a menu
         #
-        self.game.start()
+        gameEndCode = self.game.start()
+        print "Game End Code: " + str(gameEndCode)
 
 if __name__ == '__main__':
     game_main = Main()

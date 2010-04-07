@@ -14,12 +14,16 @@ class Aircraft:
         self.speed = speed
         self.waypoints = []
         self.waypoints.append(destination)
+        self.selected = False
         self.heading = self.__calculateHeading(self.location, self.waypoints[0].getLocation())
-        self.image = pygame.image.load(os.path.join('data', 'aircraft.png'))
-        self.image.convert_alpha()
+        self.image_normal = pygame.image.load(os.path.join('data', 'aircraft.png'))
+        self.image_normal.convert_alpha()
+        self.image_sel = pygame.image.load(os.path.join('data', 'aircraft_sel.png'))
+        self.image_sel.convert_alpha()
+        self.image = self.image_normal
 
 	#Add a new waypoint in the specified index in the list
-    def addWaypoint(self, waypoint, index):
+    def addWaypoint(self, waypoint, index=0):
         if((len(self.waypoints) - 1) <= Config.MAX_WAYPOINTS):
             self.waypoints.insert(index, Waypoint(waypoint))
             self.heading = self.__calculateHeading(self.location, self.waypoints[0].getLocation())
@@ -32,6 +36,13 @@ class Aircraft:
 	def setSpeed(self, newspeed):
 		self.speed = newspeed
 
+    def setSelected(self, selected):
+        self.selected = selected
+        if(selected == True):
+            self.image = self.image_sel
+        else:
+            self.image = self.image_normal
+
 	#Draw myself on the screen at my current position and heading
     def draw(self, surface):
         rot_image = pygame.transform.rotate(self.image, -self.heading)
@@ -41,6 +52,18 @@ class Aircraft:
 
         if(Config.AC_DRAW_COLLISION_RADIUS == True):
             pygame.draw.circle(surface, (255, 255, 0), self.location, Config.AC_COLLISION_RADIUS, 1)
+
+        #Draw lines and waypoints if selected
+        if(self.selected == True):
+            point_list = []
+            point_list.append(self.location)
+            for x in range(0, len(self.waypoints)-1):
+                point_list.append(self.waypoints[x].getLocation())
+                way_rect = pygame.Rect(self.waypoints[x].getLocation()[0], self.waypoints[x].getLocation()[1], 7, 7)
+                way_rect.center = self.waypoints[x].getLocation()
+                pygame.draw.rect(surface, (255, 0, 0), way_rect, 0)
+            point_list.append(self.waypoints[-1].getLocation())
+            pygame.draw.lines(surface, (255, 0, 0), False, point_list)
 
 	#Location/heading update function
     def update(self):
@@ -56,6 +79,14 @@ class Aircraft:
 		#Keep moving towards waypoint
         self.location = self.__calculateNewLocation(self.location, self.heading, self.speed)
         return False
+
+    def clickedOn(self, click):
+        x_sq = (click[0] - self.location[0]) ** 2
+        y_sq = (click[1] - self.location[1]) ** 2
+        if math.sqrt( x_sq + y_sq ) < 10:
+            return True
+        else:
+            return False
 
 	#Calculate heading based on current position and waypoint
     def __calculateHeading(self, location, waypoint):
