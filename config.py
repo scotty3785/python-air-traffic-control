@@ -29,6 +29,6 @@ class Config:
     SCORE_OBS_COLLIDE = -25             #Score for hitting obstacle
     SCORE_AC_COLLIDE = -25              #Score for hitting aircraft
 
-    AC_SPEED_DEFAULT = 0.5              #Aircraft starting speed
+    AC_SPEED_DEFAULT = 0.25             #Aircraft starting speed
     AC_COLLISION_RADIUS = 30            #Aircraft collision radius (pixels)
     AC_DRAW_COLLISION_RADIUS = False    #Draw collision radius?

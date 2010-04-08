@@ -5,6 +5,7 @@ import pygame;
 import os;
 from config import *;
 from waypoint import *;
+from game import *;
 
 class Aircraft:
 
@@ -43,6 +44,9 @@ class Aircraft:
         else:
             self.image = self.image_normal
 
+    def getLocation(self):
+        return self.location
+
 	#Draw myself on the screen at my current position and heading
     def draw(self, surface):
         rot_image = pygame.transform.rotate(self.image, -self.heading)
@@ -78,7 +82,10 @@ class Aircraft:
 		
 		#Keep moving towards waypoint
         self.location = self.__calculateNewLocation(self.location, self.heading, self.speed)
-        return False
+        #if(self.location[0] < 0 or self.location[0] > Game.AERIALPANE_W or self.location[1] < 0 or self.location[1] > Game.AERIALPANE_H):
+        #    return True
+        #else:
+        #    return False
 
     def clickedOn(self, click):
         x_sq = (click[0] - self.location[0]) ** 2

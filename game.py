@@ -86,6 +86,7 @@ class Game:
         #2: Check if any aircraft have collided with an obstacle
         #3: Check if any aircraft have reached a destination
         for a in self.aircraft:
+
             #Update positions and redraw
             reachdest = a.update()
             if(reachdest == True):
@@ -94,11 +95,13 @@ class Game:
                 self.score += Config.SCORE_REACHDEST
             else:
                 a.draw(self.screen)
+
             #Check collisions
-            #for o in self.obstacles:
-            #	self.__handleCollision(a, o)
-            #for a in self.aircraft:
-            #	self.__handleCollision(a, a)
+            for o in self.obstacles:
+            	self.__handleObstacleCollision(a, o)
+            for ac_t in self.aircraft:
+                if(ac_t != a):
+                	self.__handleAircraftCollision(ac_t, a)
 
         #4: Spawn new aircraft due for spawning
         for sp in self.aircraftspawns:
@@ -141,22 +144,28 @@ class Game:
 
     def __handleUserInteraction(self):
         ret = 0
+
         for event in pygame.event.get():
             if(event.type == pygame.MOUSEBUTTONDOWN):
-                ac_click = False
                 for ac in self.aircraft:
                     if(ac.clickedOn(event.pos)):
                         ac.setSelected(True)
                         self.ac_selected = ac
-                        ac_click = True
-                if(ac_click == False):
-                    if(self.ac_selected != None):
-                        self.ac_selected.addWaypoint(event.pos, 0)
-                for ac in self.aircraft:
-                    if(ac != self.ac_selected):
+                    else:
                         ac.setSelected(False)
             elif(event.type == pygame.QUIT):
                 ret = 2
                 break
+
         return ret
+
+    def __handleObstacleCollision(self, ac, obs):
+        if(obs.isPointInside(ac.getLocation()) == True):
+            self.score += Config.SCORE_OBS_COLLIDE
+
+    def __handleAircraftCollision(self, ac1, ac2):
+        dx2 = (ac1.getLocation()[0] - ac2.getLocation()[0])**2
+        dy2 = (ac1.getLocation()[1] - ac2.getLocation()[1])**2
+        if( dx2 + dy2 < (Config.AC_COLLISION_RADIUS ** 2) ):
+            self.score += Config.SCORE_AC_COLLIDE
 

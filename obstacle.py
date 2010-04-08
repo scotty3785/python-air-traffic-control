@@ -21,5 +21,5 @@ class Obstacle:
     def draw(self, surface):
         pygame.draw.aalines(surface, (255, 0, 0), True, self.bounds)
         
-    def pointInside(self, point):
-        
+    def isPointInside(self, point):
+        return False
