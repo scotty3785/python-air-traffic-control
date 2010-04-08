@@ -6,6 +6,7 @@ import random;
 from config import *;
 from destination import *;
 from aircraft import *;
+from obstacle import *;
 from aircraftspawnevent import *;
 
 class Game:
@@ -51,6 +52,9 @@ class Game:
             #Draw destinations
             for x in self.destinations:
                 x.draw(self.screen)
+                
+            for x in self.obstacles:
+                x.draw(self.screen)
 
             #Move/redraw aircraft
             self.__update()
@@ -65,7 +69,7 @@ class Game:
             sf_time = self.font.render("Time: " + str( math.floor((Config.GAMETIME - self.ms_elapsed) / 1000) ), True, Config.COLOR_SCORETIME)
             self.screen.blit(sf_time, (820, 40))
             
-           
+            
             #Recalc time and check for game end
             self.ms_elapsed = self.ms_elapsed + timepassed
             if(self.ms_elapsed >= Config.GAMETIME):
@@ -100,7 +104,6 @@ class Game:
         for sp in self.aircraftspawns:
             if self.ms_elapsed >= sp.getTime():
                 ac = Aircraft(sp.getSpawnPoint(), Config.AC_SPEED_DEFAULT, sp.getDestination())
-                ac.addWaypoint((400, 400))
                 self.aircraft.append(ac)
                 self.aircraftspawns.remove(sp)
 
@@ -121,7 +124,8 @@ class Game:
             self.destinations.append(dest)
 
     def __generateObstacles(self):
-        pass
+        obs = Obstacle(0, [(400, 400), (300, 400), (300, 300), (350, 350)])
+        self.obstacles.append(obs)
 
     def __generateRandomSpawnPoint(self):
         side = random.randint(1, 4)
@@ -136,13 +140,23 @@ class Game:
         return loc
 
     def __handleUserInteraction(self):
+        ret = 0
         for event in pygame.event.get():
-           if(event.type == pygame.MOUSEBUTTONDOWN):
+            if(event.type == pygame.MOUSEBUTTONDOWN):
+                ac_click = False
                 for ac in self.aircraft:
                     if(ac.clickedOn(event.pos)):
                         ac.setSelected(True)
                         self.ac_selected = ac
-                    else:
+                        ac_click = True
+                if(ac_click == False):
+                    if(self.ac_selected != None):
+                        self.ac_selected.addWaypoint(event.pos, 0)
+                for ac in self.aircraft:
+                    if(ac != self.ac_selected):
                         ac.setSelected(False)
-        return 0
+            elif(event.type == pygame.QUIT):
+                ret = 2
+                break
+        return ret
 

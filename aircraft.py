@@ -61,9 +61,9 @@ class Aircraft:
                 point_list.append(self.waypoints[x].getLocation())
                 way_rect = pygame.Rect(self.waypoints[x].getLocation()[0], self.waypoints[x].getLocation()[1], 7, 7)
                 way_rect.center = self.waypoints[x].getLocation()
-                pygame.draw.rect(surface, (255, 0, 0), way_rect, 0)
+                pygame.draw.rect(surface, (0, 0, 255), way_rect, 0)
             point_list.append(self.waypoints[-1].getLocation())
-            pygame.draw.lines(surface, (255, 0, 0), False, point_list)
+            pygame.draw.aalines(surface, (0, 0, 255), False, point_list)
 
 	#Location/heading update function
     def update(self):
