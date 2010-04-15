@@ -26,6 +26,7 @@ class Game:
         self.aircraft = []
         self.obstacles = []
         self.destinations = []
+        self.aircraftspawntimes = []
         self.aircraftspawns = []
 
         #UI vars
@@ -104,11 +105,12 @@ class Game:
                 	self.__handleAircraftCollision(ac_t, a)
 
         #4: Spawn new aircraft due for spawning
-        for sp in self.aircraftspawns:
-            if self.ms_elapsed >= sp.getTime():
-                ac = Aircraft(sp.getSpawnPoint(), Config.AC_SPEED_DEFAULT, sp.getDestination())
-                self.aircraft.append(ac)
-                self.aircraftspawns.remove(sp)
+        if self.ms_elapsed >= self.aircraftspawntimes[0]:
+            sp = self.aircraftspawns[0]
+            ac = Aircraft(sp.getSpawnPoint(), Config.AC_SPEED_DEFAULT, sp.getDestination())
+            self.aircraft.append(ac)
+            self.aircraftspawns.remove(sp)
+            self.aircraftspawntimes.remove(self.aircraftspawntimes[0])
 
 
     def __generateAircraftSpawnEvents(self):
@@ -116,8 +118,10 @@ class Game:
             randtime = random.randint(1, Config.GAMETIME)
             randspawn = self.__generateRandomSpawnPoint();
             randdest = random.choice(self.destinations)
-            spawnevent = AircraftSpawnEvent(randtime, randspawn, randdest)
+            spawnevent = AircraftSpawnEvent(randspawn, randdest)
+            self.aircraftspawntimes.append(randtime)
             self.aircraftspawns.append(spawnevent)
+        self.aircraftspawntimes.sort()
 
     def __generateDestinations(self):
         for x in range(0, Config.NUMBEROFDESTINATIONS):
@@ -156,6 +160,10 @@ class Game:
             elif(event.type == pygame.QUIT):
                 ret = 2
                 break
+            elif(event.type == pygame.KEYDOWN):
+                if(event.key == pygame.K_ESCAPE):
+                    ret = 2
+                    break
 
         return ret
 

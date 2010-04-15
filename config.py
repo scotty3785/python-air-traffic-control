@@ -26,8 +26,8 @@ class Config:
     DE_DEST = 2;                        #Num destinations
 
     SCORE_REACHDEST = 100               #Score for reaching destination
-    SCORE_OBS_COLLIDE = -25             #Score for hitting obstacle
-    SCORE_AC_COLLIDE = -25              #Score for hitting aircraft
+    SCORE_OBS_COLLIDE = -5              #Score for hitting obstacle
+    SCORE_AC_COLLIDE = -5               #Score for hitting aircraft
 
     AC_SPEED_DEFAULT = 0.25             #Aircraft starting speed
     AC_COLLISION_RADIUS = 30            #Aircraft collision radius (pixels)
