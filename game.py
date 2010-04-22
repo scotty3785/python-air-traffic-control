@@ -8,11 +8,14 @@ from destination import *;
 from aircraft import *;
 from obstacle import *;
 from aircraftspawnevent import *;
+from utility import *;
 
 class Game:
 
-    AERIALPANE_W = 795;
-    AERIALPANE_H = 768;
+    AERIALPANE_W = 795
+    AERIALPANE_H = 768
+    STRIPPANE_TOP = 152
+    STRIPPANE_H = 44
 
     def __init__(self, screen):
         #Imagey type stuff
@@ -21,6 +24,9 @@ class Game:
         self.screen = screen
 
         #Game state vars
+        self.radar_angle = 0
+
+        #Aircraft/destination state vars
         self.ms_elapsed = 0
         self.score = 0
         self.aircraft = []
@@ -46,9 +52,25 @@ class Game:
             timepassed = clock.tick(Config.FRAMERATE)
 
             gameEnd = self.__handleUserInteraction()
-    
+
+            for a in self.aircraft:
+                a.setSelected(False)
+            
+            if(self.ac_selected != None):
+                self.ac_selected.setSelected(True)
+            
             #Draw background
             self.screen.blit(self.background, (0, 0))
+
+            #Draw + update radar
+            if(self.radar_angle == 0):
+                self.radar_angle = 359
+            else:
+                self.radar_angle -= Config.RADAR_SCAN_ANGLE
+            pygame.draw.circle(self.screen, Config.RADAR_CIRC_COLOR, (Game.AERIALPANE_W / 2, Game.AERIALPANE_H / 2), Config.RADAR_RADIUS * 1/3, 1)
+            pygame.draw.circle(self.screen, Config.RADAR_CIRC_COLOR, (Game.AERIALPANE_W / 2, Game.AERIALPANE_H / 2), Config.RADAR_RADIUS * 2/3, 1)
+            pygame.draw.circle(self.screen, Config.RADAR_CIRC_COLOR, (Game.AERIALPANE_W / 2, Game.AERIALPANE_H / 2), Config.RADAR_RADIUS, 1)
+            pygame.draw.line(self.screen, Config.RADAR_LINE_COLOR, (Game.AERIALPANE_W / 2, Game.AERIALPANE_H / 2), self.__calcRadarEndPoint(self.radar_angle), 3)
 
             #Draw destinations
             for x in self.destinations:
@@ -57,11 +79,9 @@ class Game:
             for x in self.obstacles:
                 x.draw(self.screen)
 
-            #Move/redraw aircraft
+            #Move/redraw/collide aircraft
             self.__update()
-
-            #Draw flight strip pane
-
+               
 
             #Draw score/time indicators
             sf_score = self.font.render("Score: " + str(self.score), True, Config.COLOR_SCORETIME)
@@ -86,7 +106,9 @@ class Game:
         #1: Update the positions of all existing aircraft
         #2: Check if any aircraft have collided with an obstacle
         #3: Check if any aircraft have reached a destination
-        for a in self.aircraft:
+        for n in range(0, len(self.aircraft)):
+
+            a = self.aircraft[n]
 
             #Update positions and redraw
             reachdest = a.update()
@@ -95,7 +117,7 @@ class Game:
                 self.aircraft.remove(a)
                 self.score += Config.SCORE_REACHDEST
             else:
-                a.draw(self.screen)
+                a.draw(self.screen, n)
 
             #Check collisions
             for o in self.obstacles:
@@ -107,7 +129,7 @@ class Game:
         #4: Spawn new aircraft due for spawning
         if self.ms_elapsed >= self.aircraftspawntimes[0]:
             sp = self.aircraftspawns[0]
-            ac = Aircraft(sp.getSpawnPoint(), Config.AC_SPEED_DEFAULT, sp.getDestination())
+            ac = Aircraft(sp.getSpawnPoint(), Config.AC_SPEED_DEFAULT, sp.getDestination(), "BA" + str(random.randint(1, 100)))
             self.aircraft.append(ac)
             self.aircraftspawns.remove(sp)
             self.aircraftspawntimes.remove(self.aircraftspawntimes[0])
@@ -151,12 +173,17 @@ class Game:
 
         for event in pygame.event.get():
             if(event.type == pygame.MOUSEBUTTONDOWN):
-                for ac in self.aircraft:
-                    if(ac.clickedOn(event.pos)):
-                        ac.setSelected(True)
-                        self.ac_selected = ac
-                    else:
-                        ac.setSelected(False)
+                clickedac = self.__getACClickedOn(event.pos)
+                if(clickedac != None):
+                    #Clicked an aircraft
+                    self.ac_selected = clickedac
+                elif( (event.pos.x > 795) and (152 <= event.pos.y <= 652) ):
+                    #Clicked a flightstrip
+                    for a in self.aircraft:
+                        if(a.getFlightstrip().clickedOn(event.pos) == True):
+                            self.ac_selected = a
+                        
+
             elif(event.type == pygame.QUIT):
                 ret = 2
                 break
@@ -164,7 +191,6 @@ class Game:
                 if(event.key == pygame.K_ESCAPE):
                     ret = 2
                     break
-
         return ret
 
     def __handleObstacleCollision(self, ac, obs):
@@ -176,4 +202,19 @@ class Game:
         dy2 = (ac1.getLocation()[1] - ac2.getLocation()[1])**2
         if( dx2 + dy2 < (Config.AC_COLLISION_RADIUS ** 2) ):
             self.score += Config.SCORE_AC_COLLIDE
+
+    def __calcRadarEndPoint(self, angle):
+        dx = Config.RADAR_RADIUS * math.sin(math.radians(angle))
+        dy = Config.RADAR_RADIUS * math.cos(math.radians(angle))
+        return ( (Game.AERIALPANE_W / 2) + dx, (Game.AERIALPANE_H / 2) - dy)
+
+    def __getACClickedOn(self, clickpos):
+        foundac = None
+        mindistsq = (Game.AERIALPANE_W ** 2, Game.AERIALPANE_H ** 2)
+        for ac in self.aircraft:
+            distsq = Utility.locDistSq( ac.getLocation(), clickpos )
+            if( (ac.clickedOn(clickpos) == True) and ( distsq < mindistsq ) ):
+                foundac = ac
+                mindistsq = distsq
+        return foundac
 

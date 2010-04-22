@@ -5,12 +5,14 @@ import pygame;
 import os;
 from config import *;
 from waypoint import *;
+from flightstrip import *;
 from game import *;
+from utility import *;
 
 class Aircraft:
 
 	#Constructor!
-    def __init__(self, location, speed, destination):
+    def __init__(self, location, speed, destination, text):
         self.location = location;
         self.speed = speed
         self.waypoints = []
@@ -22,6 +24,7 @@ class Aircraft:
         self.image_sel = pygame.image.load(os.path.join('data', 'aircraft_sel.png'))
         self.image_sel.convert_alpha()
         self.image = self.image_normal
+        self.flightstrip = Flightstrip(self, text)
 
 	#Add a new waypoint in the specified index in the list
     def addWaypoint(self, waypoint, index=0):
@@ -48,7 +51,7 @@ class Aircraft:
         return self.location
 
 	#Draw myself on the screen at my current position and heading
-    def draw(self, surface):
+    def draw(self, surface, index):
         rot_image = pygame.transform.rotate(self.image, -self.heading)
         rect = rot_image.get_rect()
         rect.center = self.location
@@ -69,6 +72,9 @@ class Aircraft:
             point_list.append(self.waypoints[-1].getLocation())
             pygame.draw.aalines(surface, (0, 0, 255), False, point_list)
 
+        #Draw flightstrip
+        self.flightstrip.draw(surface)
+
 	#Location/heading update function
     def update(self):
         if(self.__reachedWaypoint(self.location, self.waypoints[0].getLocation())):
@@ -88,9 +94,7 @@ class Aircraft:
         #    return False
 
     def clickedOn(self, click):
-        x_sq = (click[0] - self.location[0]) ** 2
-        y_sq = (click[1] - self.location[1]) ** 2
-        if math.sqrt( x_sq + y_sq ) < 10:
+        if Utility.locDistSq(self.location, click) <= 100:
             return True
         else:
             return False
@@ -111,10 +115,7 @@ class Aircraft:
 
 	#Check whether I have reached the given waypoint
     def __reachedWaypoint(self, location, waypoint):
-        x = (location[0] - waypoint[0])**2
-        y = (location[1] - waypoint[1])**2
-        distance = math.sqrt(x+y)
-        if distance < 2:
+        if Utility.locDistSq(location, waypoint) < (self.speed ** 2):
             return True
         else:
             return False
