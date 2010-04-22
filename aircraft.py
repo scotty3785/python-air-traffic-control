@@ -40,10 +40,6 @@ class Aircraft:
 	def getWaypoint(self, index):
 		return self.waypoints[index]
 
-    #Return flightstrip object
-    def getFlightstrip(self):
-        return self.flightstrip
-
     #Return current location
     def getLocation(self):
         return self.location

@@ -2,6 +2,11 @@
 
 class Utility:
 
+    # Function: locDist(loc1, loc2)
+    # Returns the Euclidean distance between two points in 2D space.
+    # Uses Pythagoras theorem to compute. If you do not *need* the
+    # result square rooted, it is preferred that you use locDistSq
+    # and square the comparator, as it is faster.
     @staticmethod
     def locDist(loc1, loc2):
         return math.sqrt( Utility.locationDistanceSq(loc1, loc2) )
