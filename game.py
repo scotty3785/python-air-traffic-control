@@ -106,15 +106,16 @@ class Game:
         #1: Update the positions of all existing aircraft
         #2: Check if any aircraft have collided with an obstacle
         #3: Check if any aircraft have reached a destination
-        for n in range(0, len(self.aircraft)):
+        ac_removal = []
 
+        for n in range(0, len(self.aircraft)):
             a = self.aircraft[n]
 
             #Update positions and redraw
             reachdest = a.update()
             if(reachdest == True):
-                #Remove aircraft and add to score
-                self.aircraft.remove(a)
+                #Schedule aircraft for removal
+                ac_removal.append(a)
                 self.score += Config.SCORE_REACHDEST
             else:
                 a.draw(self.screen, n)
@@ -126,13 +127,17 @@ class Game:
                 if(ac_t != a):
                 	self.__handleAircraftCollision(ac_t, a)
 
+        for a in ac_removal:
+            self.aircraft.remove(a)
+
         #4: Spawn new aircraft due for spawning
-        if self.ms_elapsed >= self.aircraftspawntimes[0]:
-            sp = self.aircraftspawns[0]
-            ac = Aircraft(sp.getSpawnPoint(), Config.AC_SPEED_DEFAULT, sp.getDestination(), "BA" + str(random.randint(1, 100)))
-            self.aircraft.append(ac)
-            self.aircraftspawns.remove(sp)
-            self.aircraftspawntimes.remove(self.aircraftspawntimes[0])
+        if(len(self.aircraftspawntimes) != 0):
+            if self.ms_elapsed >= self.aircraftspawntimes[0]:
+                sp = self.aircraftspawns[0]
+                ac = Aircraft(sp.getSpawnPoint(), Config.AC_SPEED_DEFAULT, sp.getDestination(), "BA" + str(random.randint(1, 100)))
+                self.aircraft.append(ac)
+                self.aircraftspawns.remove(sp)
+                self.aircraftspawntimes.remove(self.aircraftspawntimes[0])
 
 
     def __generateAircraftSpawnEvents(self):
@@ -153,8 +158,7 @@ class Game:
             self.destinations.append(dest)
 
     def __generateObstacles(self):
-        obs = Obstacle(0, [(400, 400), (300, 400), (300, 300), (350, 350)])
-        self.obstacles.append(obs)
+        pass                    #TODO
 
     def __generateRandomSpawnPoint(self):
         side = random.randint(1, 4)
@@ -177,12 +181,8 @@ class Game:
                 if(clickedac != None):
                     #Clicked an aircraft
                     self.ac_selected = clickedac
-                elif( (event.pos.x > 795) and (152 <= event.pos.y <= 652) ):
-                    #Clicked a flightstrip
-                    for a in self.aircraft:
-                        if(a.getFlightstrip().clickedOn(event.pos) == True):
-                            self.ac_selected = a
-                        
+                else:
+                    self.ac_selected = None
 
             elif(event.type == pygame.QUIT):
                 ret = 2
@@ -210,11 +210,16 @@ class Game:
 
     def __getACClickedOn(self, clickpos):
         foundac = None
-        mindistsq = (Game.AERIALPANE_W ** 2, Game.AERIALPANE_H ** 2)
-        for ac in self.aircraft:
-            distsq = Utility.locDistSq( ac.getLocation(), clickpos )
-            if( (ac.clickedOn(clickpos) == True) and ( distsq < mindistsq ) ):
+        #TODO
+        #mindistsq = (Game.AERIALPANE_W ** 2, Game.AERIALPANE_H ** 2)
+        for i in range(0, len(self.aircraft)):
+            ac = self.aircraft[i]
+            #distsq = Utility.locDistSq( ac.getLocation(), clickpos )
+            #if( (ac.clickedOn(clickpos) == True) and ( distsq < mindistsq ) ):
+            #    foundac = ac
+            #    mindistsq = distsq
+            if( ac.clickedOn(clickpos, i) ):
                 foundac = ac
-                mindistsq = distsq
+                break
         return foundac
 

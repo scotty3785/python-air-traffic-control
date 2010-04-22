@@ -5,26 +5,30 @@ import pygame;
 import os;
 from config import *;
 from waypoint import *;
-from flightstrip import *;
 from game import *;
 from utility import *;
 
 class Aircraft:
 
 	#Constructor!
-    def __init__(self, location, speed, destination, text):
+    def __init__(self, location, speed, destination, ident):
+
+        #Game state vars
         self.location = location;
         self.speed = speed
         self.waypoints = []
         self.waypoints.append(destination)
+        self.ident = ident
         self.selected = False
         self.heading = self.__calculateHeading(self.location, self.waypoints[0].getLocation())
+
+        #Image/font vars
         self.image_normal = pygame.image.load(os.path.join('data', 'aircraft.png'))
         self.image_normal.convert_alpha()
         self.image_sel = pygame.image.load(os.path.join('data', 'aircraft_sel.png'))
         self.image_sel.convert_alpha()
         self.image = self.image_normal
-        self.flightstrip = Flightstrip(self, text)
+        self.font = pygame.font.Font(None, Config.FS_FONTSIZE)
 
 	#Add a new waypoint in the specified index in the list
     def addWaypoint(self, waypoint, index=0):
@@ -36,19 +40,29 @@ class Aircraft:
 	def getWaypoint(self, index):
 		return self.waypoints[index]
 
+    #Return flightstrip object
+    def getFlightstrip(self):
+        return self.flightstrip
+
+    #Return current location
+    def getLocation(self):
+        return self.location
+
+    #Return current heading
+    def getHeading(self):
+        return self.heading
+
 	#Set speed in pixels per frame
 	def setSpeed(self, newspeed):
 		self.speed = newspeed
 
+    #Set whether I am the selected aircraft or not
     def setSelected(self, selected):
         self.selected = selected
         if(selected == True):
             self.image = self.image_sel
         else:
             self.image = self.image_normal
-
-    def getLocation(self):
-        return self.location
 
 	#Draw myself on the screen at my current position and heading
     def draw(self, surface, index):
@@ -73,7 +87,7 @@ class Aircraft:
             pygame.draw.aalines(surface, (0, 0, 255), False, point_list)
 
         #Draw flightstrip
-        self.flightstrip.draw(surface)
+        self.__drawFlightstrip(surface, index)
 
 	#Location/heading update function
     def update(self):
@@ -88,13 +102,17 @@ class Aircraft:
 		
 		#Keep moving towards waypoint
         self.location = self.__calculateNewLocation(self.location, self.heading, self.speed)
-        #if(self.location[0] < 0 or self.location[0] > Game.AERIALPANE_W or self.location[1] < 0 or self.location[1] > Game.AERIALPANE_H):
-        #    return True
-        #else:
-        #    return False
 
-    def clickedOn(self, click):
-        if Utility.locDistSq(self.location, click) <= 100:
+    def clickedOn(self, clickpos, index):
+        if (Utility.locDistSq(self.location, clickpos) <= 100) or (self.__clickedOnFlightstrip(clickpos, index) == True):
+            return True
+        else:
+            return False
+
+    def __clickedOnFlightstrip(self, clickpos, index):
+        top = 152 + (index * 50)
+        bottom = 152 + ((index + 1) * 50) - 1
+        if (clickpos[0] > 795) and (top <= clickpos[1] <= bottom):
             return True
         else:
             return False
@@ -119,3 +137,13 @@ class Aircraft:
             return True
         else:
             return False
+
+    def __drawFlightstrip(self, surface, index):
+        left = 795
+        top = 152 + (index * 50)
+        bottom = 152 + ((index + 1) * 50) - 1
+        pygame.draw.line(surface, (255, 255, 255), (795, bottom), (1023, bottom), 1)
+        srf_ident = self.font.render(self.ident, False, (255, 255, 255))
+        surface.blit(srf_ident, (left + 5, top + 4))
+        
+        
