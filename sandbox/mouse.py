@@ -4,7 +4,7 @@ Demonstrate how the mouse events are used in pygame
 Create waypoints and link them with a line
 """
 
-#Import Modules
+# Import Modules
 import os, pygame
 from pygame.locals import *
 
@@ -12,7 +12,7 @@ if not pygame.font: print 'Warning, fonts disabled'
 if not pygame.mixer: print 'Warning, sound disabled'
 
 
-#functions to create our resources
+# Functions to create our resources
 def load_image(name, colorkey=None):
     fullname = os.path.join('data', name)
     try:
@@ -50,40 +50,70 @@ class Waypoint(pygame.sprite.Sprite):
 	def unclick(self):
 		self.clicked = False
 
+	# Scott's code
+	#def waypoint_render(wps):
+	#	for count in range(0, len(wps)-1):
+	#		pygame.draw.circle(screen, (0, 0, 255), wps[count], 5, 0)
+	#		pygame.draw.line(screen, (0,0,255), wps[count], wps[count+1], 1)
+	#		pygame.draw.circle(screen, (0, 0, 255), wps[len(wps)-1], 5, 0)
+
+# A route is a collection of waypoints
+# Inheritance or aggregation of list? For now aggregation
+class Route(pygame.sprite.Sprite):
+	def __init__(self):
+		self.waypoints = []
+		self.pointlist = []
+
+	def draw(self,screen):
+		for i in range(1,len(self.waypoints)):
+			pygame.draw.line(screen, (255,0,0), self.waypoints[i-1].pos, self.waypoints[i].pos,2)
+		# self.pointlist not updated when waypoints are moved so this doesn't work
+		#if (len(self.pointlist) > 1):
+		#	pygame.draw.lines(screen, (255,0,0), 0, self.pointlist, 2)
+
+
+	def addWaypoint(self, wp):
+		self.waypoints.append(wp)
+		self.pointlist.append(wp.pos)
+
+	def delWaypoint(self, wp):
+		print "del waypoint"
+
 
 def main():
     """this function is called when the program starts.
        it initializes everything it needs, then runs in
        a loop until the function returns."""
-#Initialize Everything
+# Initialize Everything
     pygame.init()
     screen = pygame.display.set_mode((468, 468))
     pygame.display.set_caption('Mouse test')
     pygame.mouse.set_cursor(*pygame.cursors.diamond)
     pygame.mouse.set_visible(1)
 
-#Create The Backgound
+# Create The Backgound
     background = pygame.Surface(screen.get_size())
     background = background.convert()
 	# Set the background colour
     background.fill((0, 100, 0))
     
-#Display The Background
+# Display The Background
     screen.blit(background, (0, 0))
     pygame.display.flip()
     
-#Prepare Game Objects
+# Prepare Game Objects
     clock = pygame.time.Clock()
 	# Create a group/container for all the waypoint sprites to be drawn
     waypoints = pygame.sprite.RenderUpdates()
 
     all_waypoints = []
+    route = Route()
     
-#Main Loop
+# Main Loop
     while 1:
         clock.tick(60)
 
-    #Handle Input Events
+    # Handle Input Events
         for event in pygame.event.get():
             if event.type == QUIT:
                 return
@@ -91,31 +121,35 @@ def main():
                 return
             elif event.type == MOUSEBUTTONDOWN:
 				# Check if clicked on an existing waypoint
-				sprites_clicked = [sprite for sprite in all_waypoints if sprite.rect.collidepoint(pygame.mouse.get_pos())]
+				sprites_clicked = [sprite for sprite in route.waypoints #all_waypoints
+						if sprite.rect.collidepoint(pygame.mouse.get_pos())]
 				print sprites_clicked
 				# If not, then create a new one
 				if (not sprites_clicked):
 					w = Waypoint()
 					waypoints.add(w)
+					route.addWaypoint(w)
+					print route.waypoints
 					all_waypoints.append(w)
 				else:
 					print "sprite already exists"
 					sprites_clicked[0].click()
             elif event.type == MOUSEBUTTONUP:
-                #fist.unpunch()
 				if (sprites_clicked):
 					sprites_clicked[0].unclick()
 				pass
 
         waypoints.update()
+        #route.update()
 
-    #Draw Everything
+    # Draw everything
         screen.blit(background, (0, 0))
         waypoints.draw(screen)
+        route.draw(screen)
         pygame.display.flip()
 
-#Game Over
+# Game Over
 
 
-#this calls the 'main' function when this script is executed
+# This calls the 'main' function when this script is executed
 if __name__ == '__main__': main()
