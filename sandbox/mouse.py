@@ -5,7 +5,7 @@ Create waypoints and link them with a line
 """
 
 # Import Modules
-import os, pygame
+import os, pygame, string
 from pygame.locals import *
 
 if not pygame.font: print 'Warning, fonts disabled'
@@ -31,7 +31,7 @@ def load_image(name, colorkey=None):
 def drawtext(screen,text,font):
 	x = 50
 	y = 100
-	tmp = list(text)
+	tmp = string.split(text,"\n")
 	tmp.reverse()
 	for line in tmp:
 		img = font.render(line,1,(30,30,30),(200,100,200))
@@ -161,7 +161,7 @@ def main():
         screen.blit(background, (0, 0))
         waypoints.draw(screen)
         route.draw(screen)
-        drawtext(screen, ("ERJ145","FL24","140kts"),font)
+        drawtext(screen, ("ERJ145\nFL24\n140kts"),font)
         pygame.display.flip()
 
 # Game Over
