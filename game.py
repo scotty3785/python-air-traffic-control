@@ -23,9 +23,6 @@ class Game:
         self.font = pygame.font.Font(None, 30)
         self.screen = screen
 
-        #Game state vars
-        self.radar_angle = 0
-
         #Aircraft/destination state vars
         self.ms_elapsed = 0
         self.score = 0
@@ -37,6 +34,7 @@ class Game:
 
         #UI vars
         self.ac_selected = None
+        self.way_clicked = None
 
         #Generations functions
         self.__generateDestinations()
@@ -62,15 +60,10 @@ class Game:
             #Draw background
             self.screen.blit(self.background, (0, 0))
 
-            #Draw + update radar
-            if(self.radar_angle == 0):
-                self.radar_angle = 359
-            else:
-                self.radar_angle -= Config.RADAR_SCAN_ANGLE
+            #Draw radar circles
             pygame.draw.circle(self.screen, Config.RADAR_CIRC_COLOR, (Game.AERIALPANE_W / 2, Game.AERIALPANE_H / 2), Config.RADAR_RADIUS * 1/3, 1)
             pygame.draw.circle(self.screen, Config.RADAR_CIRC_COLOR, (Game.AERIALPANE_W / 2, Game.AERIALPANE_H / 2), Config.RADAR_RADIUS * 2/3, 1)
             pygame.draw.circle(self.screen, Config.RADAR_CIRC_COLOR, (Game.AERIALPANE_W / 2, Game.AERIALPANE_H / 2), Config.RADAR_RADIUS, 1)
-            pygame.draw.line(self.screen, Config.RADAR_LINE_COLOR, (Game.AERIALPANE_W / 2, Game.AERIALPANE_H / 2), self.__calcRadarEndPoint(self.radar_angle), 3)
 
             #Draw destinations
             for x in self.destinations:
@@ -81,7 +74,6 @@ class Game:
 
             #Move/redraw/collide aircraft
             self.__update()
-               
 
             #Draw score/time indicators
             sf_score = self.font.render("Score: " + str(self.score), True, Config.COLOR_SCORETIME)
@@ -128,6 +120,9 @@ class Game:
                 	self.__handleAircraftCollision(ac_t, a)
 
         for a in ac_removal:
+            if(self.ac_selected == a):
+                a.setSelected(False)
+                self.ac_selected = None
             self.aircraft.remove(a)
 
         #4: Spawn new aircraft due for spawning
@@ -136,6 +131,7 @@ class Game:
                 sp = self.aircraftspawns[0]
                 ac = Aircraft(sp.getSpawnPoint(), Config.AC_SPEED_DEFAULT, sp.getDestination(), "BA" + str(random.randint(1, 100)))
                 self.aircraft.append(ac)
+                ac.addWaypoint((400, 400), 0)
                 self.aircraftspawns.remove(sp)
                 self.aircraftspawntimes.remove(self.aircraftspawntimes[0])
 
@@ -182,8 +178,22 @@ class Game:
                     #Clicked an aircraft
                     self.ac_selected = clickedac
                 else:
-                    self.ac_selected = None
-
+                    if(self.ac_selected != None):
+                        #Not clicked aircraft, check waypoints for current selected ac
+                        wclick = False
+                        for x in range(0, len(self.ac_selected.getWaypoints()) - 1):
+                            w = self.ac_selected.getWaypoints()[x]
+                            if(w.clickedOn(event.pos) == True):
+                                self.way_clicked = w
+                                wclick = True
+                        if wclick == False:
+                            self.ac_selected = None
+            elif(event.type == pygame.MOUSEBUTTONUP):
+                if(self.way_clicked != None):
+                    self.way_clicked = None
+            elif(event.type == pygame.MOUSEMOTION):
+                if(self.way_clicked != None):
+                    self.way_clicked.setLocation(event.pos)
             elif(event.type == pygame.QUIT):
                 ret = 2
                 break
@@ -198,28 +208,20 @@ class Game:
             self.score += Config.SCORE_OBS_COLLIDE
 
     def __handleAircraftCollision(self, ac1, ac2):
-        dx2 = (ac1.getLocation()[0] - ac2.getLocation()[0])**2
-        dy2 = (ac1.getLocation()[1] - ac2.getLocation()[1])**2
-        if( dx2 + dy2 < (Config.AC_COLLISION_RADIUS ** 2) ):
+        if( Utility.locDistSq(ac1.getLocation(), ac2.getLocation()) < (Config.AC_COLLISION_RADIUS ** 2) ):
             self.score += Config.SCORE_AC_COLLIDE
-
-    def __calcRadarEndPoint(self, angle):
-        dx = Config.RADAR_RADIUS * math.sin(math.radians(angle))
-        dy = Config.RADAR_RADIUS * math.cos(math.radians(angle))
-        return ( (Game.AERIALPANE_W / 2) + dx, (Game.AERIALPANE_H / 2) - dy)
 
     def __getACClickedOn(self, clickpos):
         foundac = None
-        #TODO
-        #mindistsq = (Game.AERIALPANE_W ** 2, Game.AERIALPANE_H ** 2)
+        mindistsq = 100
         for i in range(0, len(self.aircraft)):
             ac = self.aircraft[i]
-            #distsq = Utility.locDistSq( ac.getLocation(), clickpos )
-            #if( (ac.clickedOn(clickpos) == True) and ( distsq < mindistsq ) ):
-            #    foundac = ac
-            #    mindistsq = distsq
-            if( ac.clickedOn(clickpos, i) ):
+            distsq = ac.getClickDistanceSq(clickpos)
+            if( ac.clickedOnFlightstrip(clickpos, i) ):
                 foundac = ac
-                break
+                break;
+            elif( distsq < mindistsq ):
+                foundac = ac
+                mindistsq = distsq
         return foundac
 

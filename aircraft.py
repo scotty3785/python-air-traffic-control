@@ -10,6 +10,18 @@ from utility import *;
 
 class Aircraft:
 
+    AC_IMAGE_NORMAL = pygame.image.load(os.path.join('data', 'aircraft.png'))
+    AC_IMAGE_SELECTED = pygame.image.load(os.path.join('data', 'aircraft_sel.png'))
+
+    FS_IMAGE_SPEED_UP = pygame.image.load(os.path.join('data', 'arrow_up.png'))
+    FS_IMAGE_SPEED_DOWN = pygame.image.load(os.path.join('data', 'arrow_down.png'))
+
+    FS_FONTSIZE = 18
+    FS_FONT_COLOR_NORMAL = (255, 255, 255)
+    FS_FONT_COLOR_SELECTED = (50, 255, 50)
+    FS_BG_COLOR_NORMAL = (60, 60, 60)
+    FS_BG_COLOR_SELECTED = (60, 40, 255)
+
 	#Constructor!
     def __init__(self, location, speed, destination, ident):
 
@@ -22,13 +34,16 @@ class Aircraft:
         self.selected = False
         self.heading = self.__calculateHeading(self.location, self.waypoints[0].getLocation())
 
+        Aircraft.AC_IMAGE_NORMAL.convert_alpha()
+        Aircraft.AC_IMAGE_SELECTED.convert_alpha()
+        Aircraft.FS_IMAGE_SPEED_UP.convert_alpha()
+        Aircraft.FS_IMAGE_SPEED_DOWN.convert_alpha()
+
         #Image/font vars
-        self.image_normal = pygame.image.load(os.path.join('data', 'aircraft.png'))
-        self.image_normal.convert_alpha()
-        self.image_sel = pygame.image.load(os.path.join('data', 'aircraft_sel.png'))
-        self.image_sel.convert_alpha()
-        self.image = self.image_normal
-        self.font = pygame.font.Font(None, Config.FS_FONTSIZE)
+        self.image = Aircraft.AC_IMAGE_NORMAL
+        self.font = pygame.font.Font(None, Aircraft.FS_FONTSIZE)
+        self.fs_bg_color = Aircraft.FS_BG_COLOR_NORMAL
+        self.fs_font_color = Aircraft.FS_FONT_COLOR_NORMAL
 
 	#Add a new waypoint in the specified index in the list
     def addWaypoint(self, waypoint, index=0):
@@ -39,6 +54,9 @@ class Aircraft:
 	#Get the specified waypoint from the list
 	def getWaypoint(self, index):
 		return self.waypoints[index]
+
+    def getWaypoints(self):
+        return self.waypoints
 
     #Return current location
     def getLocation(self):
@@ -56,9 +74,13 @@ class Aircraft:
     def setSelected(self, selected):
         self.selected = selected
         if(selected == True):
-            self.image = self.image_sel
+            self.image = Aircraft.AC_IMAGE_SELECTED
+            self.fs_font_color = Aircraft.FS_FONT_COLOR_SELECTED
+            self.fs_bg_color = Aircraft.FS_BG_COLOR_SELECTED
         else:
-            self.image = self.image_normal
+            self.image = Aircraft.AC_IMAGE_NORMAL
+            self.fs_font_color = Aircraft.FS_FONT_COLOR_NORMAL
+            self.fs_bg_color = Aircraft.FS_BG_COLOR_NORMAL
 
 	#Draw myself on the screen at my current position and heading
     def draw(self, surface, index):
@@ -76,9 +98,7 @@ class Aircraft:
             point_list.append(self.location)
             for x in range(0, len(self.waypoints)-1):
                 point_list.append(self.waypoints[x].getLocation())
-                way_rect = pygame.Rect(self.waypoints[x].getLocation()[0], self.waypoints[x].getLocation()[1], 7, 7)
-                way_rect.center = self.waypoints[x].getLocation()
-                pygame.draw.rect(surface, (0, 0, 255), way_rect, 0)
+                self.waypoints[x].draw(surface)
             point_list.append(self.waypoints[-1].getLocation())
             pygame.draw.aalines(surface, (0, 0, 255), False, point_list)
 
@@ -93,22 +113,18 @@ class Aircraft:
             if( len(self.waypoints) == 0):
                 #Reached destination, return True
                 return True
-            else:
-                self.heading = self.__calculateHeading(self.location, self.waypoints[0].getLocation())
 		
 		#Keep moving towards waypoint
+        self.heading = self.__calculateHeading(self.location, self.waypoints[0].getLocation())
         self.location = self.__calculateNewLocation(self.location, self.heading, self.speed)
 
-    def clickedOn(self, clickpos, index):
-        if (Utility.locDistSq(self.location, clickpos) <= 100) or (self.__clickedOnFlightstrip(clickpos, index) == True):
-            return True
-        else:
-            return False
+    def getClickDistanceSq(self, clickpos):
+        return Utility.locDistSq(clickpos, self.location)
 
-    def __clickedOnFlightstrip(self, clickpos, index):
+    def clickedOnFlightstrip(self, clickpos, index):
         top = 152 + (index * 50)
         bottom = 152 + ((index + 1) * 50) - 1
-        if (clickpos[0] > 795) and (top <= clickpos[1] <= bottom):
+        if (clickpos[0] >= 798) and (top <= clickpos[1] <= bottom):
             return True
         else:
             return False
@@ -134,12 +150,23 @@ class Aircraft:
         else:
             return False
 
+    #Draw my flight strip at the given list index position
     def __drawFlightstrip(self, surface, index):
-        left = 795
+        #Calc bounds
+        left = 798
         top = 152 + (index * 50)
         bottom = 152 + ((index + 1) * 50) - 1
-        pygame.draw.line(surface, (255, 255, 255), (795, bottom), (1023, bottom), 1)
-        srf_ident = self.font.render(self.ident, False, (255, 255, 255))
+
+        #Draw bottom line
+        pygame.draw.line(surface, (255, 255, 255), (left, bottom), (1023, bottom), 1)
+
+        #Draw background
+        pygame.draw.rect(surface, self.fs_bg_color, pygame.Rect(left, top, 226, 49), 0)
+
+        #Draw ident
+        srf_ident = self.font.render(self.ident, False, self.fs_font_color)
         surface.blit(srf_ident, (left + 5, top + 4))
-        
-        
+
+        #Draw speed
+        srf_speed = self.font.render(str(self.speed * Config.AC_SPEED_SCALEFACTOR) + "kts", False, self.fs_font_color)
+        surface.blit(srf_speed, (left + 5, top + 26))
