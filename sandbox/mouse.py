@@ -27,6 +27,18 @@ def load_image(name, colorkey=None):
         image.set_colorkey(colorkey, RLEACCEL)
     return image, image.get_rect()
 
+
+def drawtext(screen,text,font):
+	x = 50
+	y = 100
+	tmp = list(text)
+	tmp.reverse()
+	for line in tmp:
+		img = font.render(line,1,(30,30,30),(200,100,200))
+		rect = screen.blit(img, (x,y))
+		screen.fill(0, (rect.right, rect.top, 0, rect.height))
+		y = y - font.get_height()
+
 class Waypoint(pygame.sprite.Sprite):
 	def __init__(self):
 		pygame.sprite.Sprite.__init__(self)
@@ -101,6 +113,9 @@ def main():
     screen.blit(background, (0, 0))
     pygame.display.flip()
     
+# Create font
+    font = pygame.font.Font(None,20)
+
 # Prepare Game Objects
     clock = pygame.time.Clock()
 	# Create a group/container for all the waypoint sprites to be drawn
@@ -146,6 +161,7 @@ def main():
         screen.blit(background, (0, 0))
         waypoints.draw(screen)
         route.draw(screen)
+        drawtext(screen, ("ERJ145","FL24","140kts"),font)
         pygame.display.flip()
 
 # Game Over
