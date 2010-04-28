@@ -3,6 +3,7 @@
 import math;
 import pygame;
 import os;
+import string;
 from config import *;
 from waypoint import *;
 from game import *;
@@ -28,6 +29,7 @@ class Aircraft:
         #Game state vars
         self.location = location;
         self.speed = speed
+        self.altitude = 24000 # hardwired for now; measured in ft
         self.waypoints = []
         self.waypoints.append(destination)
         self.ident = ident
@@ -101,6 +103,18 @@ class Aircraft:
                 self.waypoints[x].draw(surface)
             point_list.append(self.waypoints[-1].getLocation())
             pygame.draw.aalines(surface, (0, 0, 255), False, point_list)
+
+
+		# Draw the ident string next to the aircraft?
+        x = self.location[0] + 20
+        y = self.location[1] + 20
+        #list = string.split(self.ident,"\n")
+        list = [self.ident, "FL" + str(self.altitude/100), str(self.speed * Config.AC_SPEED_SCALEFACTOR) + "kts"]
+        list.reverse()
+        for line in list:
+			id = self.font.render(line, False, self.fs_font_color)
+			r = surface.blit(id, (x,y))
+			y = y - self.font.get_height()
 
         #Draw flightstrip
         self.__drawFlightstrip(surface, index)
