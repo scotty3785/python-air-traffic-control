@@ -66,8 +66,11 @@ class Menu:
                 ret = self.__mouseMenuSelection(event.pos)
                 if (self.selection == 2):
                     self.menuEnd = 2
-                elif (self.selection == 0):
+                elif (self.selection == 1):
                     self.menuEnd = 1
+                elif (self.selection == 0):
+                    print "I clicked on start"
+                    self.menuEnd = "GO"
                 break
             elif(event.type == pygame.MOUSEMOTION):
                 a = self.__mouseMenuOver(event.pos)
@@ -89,8 +92,10 @@ class Menu:
                 elif(event.key == pygame.K_SPACE):
                     if (self.selection == 2):
                         self.menuEnd = 2
-                    elif (self.selection == 0):
+                    elif (self.selection == 1):
                         self.menuEnd = 1
+                    elif (self.selection == 0):
+                        self.menuEnd = 0
                     break
  
     def __calcRadarEndPoint(self, angle):
