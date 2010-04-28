@@ -35,35 +35,63 @@ class Menu:
         self.font = pygame.font.Font(None, 30)
         self.screen = screen
         self.radar_angle = 0
+        self.menuEnd = 0
+        self.selection = 0
         #Initialisation Stuff Done
 
-    def __handleUserInteraction(self):
-        ret = 0
+    def __mouseMenuOver(self,pos):
+            if ((520 < pos[0] < 710) and (360 < pos[1] < 385)):
+                return 0
+            elif ((520 < pos[0] < 710) and (385 < pos[1] < 420)):
+                return 1
+            elif ((520 < pos[0] < 710) and (420 < pos[1] < 450)):
+                return 2
+            else:
+                return -1
 
+    def __mouseMenuSelection(self,pos):
+            if ((520 < pos[0] < 710) and (360 < pos[1] < 385)):
+                return 0
+            elif ((520 < pos[0] < 710) and (385 < pos[1] < 420)):
+                return 1
+            elif ((520 < pos[0] < 710) and (420 < pos[1] < 450)):
+                return 2
+            else:
+                return -1
+
+    def __handleUserInteraction(self):
         for event in pygame.event.get():
             if(event.type == pygame.MOUSEBUTTONDOWN):
-                print "Mouse Click"
-                
+                print "Mouse Click: " + str(event.pos)
+                ret = self.__mouseMenuSelection(event.pos)
+                if (self.selection == 2):
+                    self.menuEnd = 2
+                elif (self.selection == 0):
+                    self.menuEnd = 1
+                break
+            elif(event.type == pygame.MOUSEMOTION):
+                a = self.__mouseMenuOver(event.pos)
+                if (0 <= a <= 2):
+                    self.selection = a
             elif(event.type == pygame.QUIT):
-                ret = 2
+                self.menuEnd = 2
                 break
             elif(event.type == pygame.KEYDOWN):
                 if(event.key == pygame.K_ESCAPE):
-                    ret = 2
+                    self.menuEnd = 2
                     break
-                elif(event.key == pygame.K_q):
-					ret = 2
-					break
                 elif(event.key == pygame.K_UP):
-					ret = 4
+					self.selection = (self.selection - 1) % 3
 					break
                 elif(event.key == pygame.K_DOWN):
-                    ret = 3
+                    self.selection = (self.selection + 1) % 3
                     break
                 elif(event.key == pygame.K_SPACE):
-                    ret = 5
+                    if (self.selection == 2):
+                        self.menuEnd = 2
+                    elif (self.selection == 0):
+                        self.menuEnd = 1
                     break
-        return ret
  
     def __calcRadarEndPoint(self, angle):
         dx = Config.RADAR_RADIUS * math.sin(math.radians(angle))
@@ -86,29 +114,12 @@ class Menu:
         erectpos = (0,420)
 
         clock = pygame.time.Clock()
-        menuEnd = 0
-        userAction = 0
-
-        while menuEnd == 0:
+  
+        while self.menuEnd == 0:
             timepassed = clock.tick(Config.FRAMERATE)
             
-            userAction = self.__handleUserInteraction()
+            self.__handleUserInteraction()
 
-            #Quit Event
-            if (userAction == 2):
-                menuEnd = 2
-            #Menu Move Down
-            elif (userAction == 3):
-                selection = (selection + 1) % 3
-            #Menu Move Up
-            elif (userAction == 4):
-                selection = (selection - 1) % 3
-            #Event Selected
-            elif (userAction == 5):
-                if (selection == 2):
-                    menuEnd = 2
-                elif (selection == 0):
-                    menuEnd = 1
             #Draw background
             self.screen.blit(self.background, (0, 0))        
             
@@ -126,17 +137,17 @@ class Menu:
             shift0 = 0
             shift1 = 0
             shift2 = 0
-            if (selection == 0):
+            if (self.selection == 0):
                 START   = Texty.render("START",0,GREEN)
                 OPTIONS = Texty.render("HIGH SCORES",0,WHITE)
                 EXIT    = Texty.render("EXIT",0,WHITE)
                 shift0=40
-            if (selection == 1):
+            if (self.selection == 1):
                 START   = Texty.render("START",0,WHITE)
                 OPTIONS = Texty.render("HIGH SCORES",0,GREEN)
                 EXIT    = Texty.render("EXIT",0,WHITE)
                 shift1=40
-            if (selection == 2):
+            if (self.selection == 2):
                 START   = Texty.render("START",0,WHITE)
                 OPTIONS = Texty.render("HIGH SCORES",0,WHITE)
                 EXIT    = Texty.render("EXIT",0,GREEN)
@@ -149,7 +160,7 @@ class Menu:
 
             #Draw Screen
             pygame.display.flip()
-        return menuEnd
+        return self.menuEnd
 
 
 
