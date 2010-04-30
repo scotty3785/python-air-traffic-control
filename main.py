@@ -5,7 +5,6 @@ from game import *;
 from menu import *;
 from highs import *
 import os;
-import sys;
 
 class Main:
 
@@ -56,6 +55,5 @@ class Main:
 
 
 if __name__ == '__main__':
-    sys.path.append("pgu")
     game_main = Main()
     game_main.run()

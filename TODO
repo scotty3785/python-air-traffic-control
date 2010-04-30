@@ -5,16 +5,16 @@ PYATC TODO LIST
 Scott
 -----
 
-
-
+- High score table
+- Main menu
 
 
 Steve
 -----
 
-
-
-
+- Tidy up event handling
+- Double-click waypoints
+- Start menu
 
 
 Tom
@@ -25,5 +25,4 @@ Tom
 - Waypoint addition                         +
 - Tidy up score/time fonts and background
 - Game end(/pause?) buttons
-- Tidy up event handling
 - Fullscreen and resolution-independence    +

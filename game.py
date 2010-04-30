@@ -1,6 +1,8 @@
 #   File: game.py
 #   Description: An instance of one game of ATC
-
+import sys
+sys.path.append('pgu');
+from pgu import gui;
 import pygame;
 import random;
 from config import *;
@@ -44,6 +46,9 @@ class Game:
         self.font = pygame.font.Font(None, 30)
         self.screen = screen
         
+        self.btn_end = gui.Button(value="End Game")
+        self.btn_end.connect(gui.CLICK, self.__callback_User_End)
+        
         #Aircraft/destination state vars
         self.gameEndCode = 0
         self.ms_elapsed = 0
@@ -80,7 +85,6 @@ class Game:
                 self.ac_selected.setSelected(True)
             
             #Draw background
-            #self.screen.blit(self.background, (0, 0))
             pygame.draw.rect(self.screen, (0, 0, 0), self.screen.get_rect())
             pygame.draw.line(self.screen, (255, 255, 255), (Game.AERIALPANE_W + 1, 0), (Game.AERIALPANE_W + 1, Game.SCREEN_H), 3)
             pygame.draw.line(self.screen, (255, 255, 255), (Game.FSPANE_LEFT, Game.FSPANE_TOP - 2), (Game.SCREEN_W, Game.FSPANE_TOP - 2), 3)
