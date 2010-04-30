@@ -26,3 +26,4 @@ class Config:
     GAME_CODE_HIGH_SCORE = 4
     GAME_CODE_KILL = -10
 
+    GAME_FULLSCREEN = False

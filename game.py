@@ -28,6 +28,8 @@ class Game:
     RADAR_RADIUS = 0
 
     COLOR_SCORETIME = (20, 193, 236)    #Score/time counter colour
+    
+    BUTTON_GAMEEND = pygame.image.load(os.path.join('data', 'button_end.png'))
 
     def __init__(self, screen):
         #Screen vars
@@ -38,7 +40,6 @@ class Game:
         Game.FSPANE_LEFT = Game.AERIALPANE_W + 3
         Game.FS_W = Game.SCREEN_W - Game.FSPANE_LEFT
         Game.FS_H = 60
-        print(Game.AERIALPANE_H)
         Game.RADAR_RADIUS = (Game.AERIALPANE_H - 50) / 2
 
         #Imagey type stuff
@@ -95,7 +96,7 @@ class Game:
             #Draw destinations
             for x in self.destinations:
                 x.draw(self.screen)
-                
+
             #Draw obstacles
             for x in self.obstacles:
                 x.draw(self.screen)
@@ -110,7 +111,6 @@ class Game:
             #Draw flightstrips
             for n in range(0, len(self.aircraft)):
                 self.aircraft[n].drawFlightstrip(self.screen, pygame.Rect((Game.FSPANE_LEFT, Game.FSPANE_TOP + (n * Game.FS_H)), (Game.FS_W, Game.FS_H)))
-                              
 
             #Draw score/time indicators
             sf_score = self.font.render("Score: " + str(self.score), True, Game.COLOR_SCORETIME)
@@ -119,6 +119,7 @@ class Game:
             self.screen.blit(sf_score, (Game.FSPANE_LEFT + 30, 10))
             self.screen.blit(sf_time, (Game.FSPANE_LEFT + 30, 40))
             
+            #Draw game end button
             
             #Recalc time and check for game end
             self.ms_elapsed = self.ms_elapsed + timepassed

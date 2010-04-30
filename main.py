@@ -14,7 +14,11 @@ class Main:
         display.init()
         font.init()
         
-        screen = display.set_mode((0, 0), pygame.FULLSCREEN)
+        if(Config.GAME_FULLSCREEN == True):
+            screen = display.set_mode((0, 0), pygame.FULLSCREEN)
+        else:
+            screen = display.set_mode((1024, 768))
+            
         display.set_caption('ATC Version 0.1')
 
         self.menu = Menu(screen)
@@ -50,3 +54,4 @@ class Main:
 if __name__ == '__main__':
     game_main = Main()
     game_main.run()
+    sys.path.append(
