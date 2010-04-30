@@ -1,6 +1,7 @@
 #	File: waypoint.py
 
 import pygame;
+from game import *;
 
 class Waypoint:
 
@@ -11,8 +12,8 @@ class Waypoint:
         return self.location
 
     def setLocation(self, location):
-        if(location[0] > 791):
-            self.location = (791, location[1])
+        if(location[0] > Game.AERIALPANE_W):
+            self.location = (Game.AERIALPANE_W, location[1])
         else:
             self.location = location
 

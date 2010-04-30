@@ -1,5 +1,4 @@
 #   File: main.py
-#   Author: Tom Woolfrey
 
 from pygame import *;
 from game import *;
@@ -11,8 +10,11 @@ class Main:
     BG_COLOR = (0, 0, 0)
 
     def __init__(self):
-        init()
-        screen = display.set_mode((1024, 768))
+        #Init the modules we need
+        display.init()
+        font.init()
+        
+        screen = display.set_mode((0, 0), pygame.FULLSCREEN)
         display.set_caption('ATC Version 0.1')
 
         self.menu = Menu(screen)
@@ -27,7 +29,7 @@ class Main:
             print "Menu End Code: " + str(menuEndCode)
             if (menuEndCode == "GO"):
                 menuEndCode = 0
-    	        gameEndCode = self.game.start()
+    	        (gameEndCode, score) = self.game.start()
                 if (gameEndCode == 1):
                 #Time has elapsed to go to make a high score entry
                     print "Make High Score Entry"

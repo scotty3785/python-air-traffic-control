@@ -1,0 +1,29 @@
+PYATC TODO LIST
+===============
+
+
+Scott
+-----
+
+
+
+
+
+Steve
+-----
+
+
+
+
+
+
+Tom
+---
+
+- Flight strip speed controls
+- Flight strip heading indicators
+- Waypoint addition
+- Tidy up score/time fonts and background
+- Game end(/pause?) buttons
+- Tidy up event handling
+- Fullscreen and resolution-independence

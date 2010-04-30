@@ -12,16 +12,38 @@ from utility import *;
 
 class Game:
 
-    AERIALPANE_W = 795
-    AERIALPANE_H = 768
-    STRIPPANE_TOP = 152
-    STRIPPANE_H = 44
+    SCREEN_W = 0
+    SCREEN_H = 0
+
+    AERIALPANE_W = 0
+    AERIALPANE_H = 0
+
+    FSPANE_LEFT = 0
+    FSPANE_TOP = 200
+
+    FS_W = 0
+    FS_H = 0
+
+    RADAR_CIRC_COLOR = (0, 0x44, 0)
+    RADAR_RADIUS = 0
+
+    COLOR_SCORETIME = (20, 193, 236)    #Score/time counter colour
 
     def __init__(self, screen):
+        #Screen vars
+        Game.SCREEN_W = screen.get_size()[0]
+        Game.SCREEN_H = screen.get_size()[1]
+        Game.AERIALPANE_W = Game.SCREEN_H
+        Game.AERIALPANE_H = Game.SCREEN_H
+        Game.FSPANE_LEFT = Game.AERIALPANE_W + 3
+        Game.FS_W = Game.SCREEN_W - Game.FSPANE_LEFT
+        Game.FS_H = 60
+        Game.RADAR_RADIUS = ((Game.AERIALPANE_H - 30) / 3)
+
         #Imagey type stuff
-        self.background = pygame.image.load(os.path.join('data', 'backdrop.png'))
         self.font = pygame.font.Font(None, 30)
         self.screen = screen
+
 
         #Aircraft/destination state vars
         self.ms_elapsed = 0
@@ -58,40 +80,52 @@ class Game:
                 self.ac_selected.setSelected(True)
             
             #Draw background
-            self.screen.blit(self.background, (0, 0))
+            #self.screen.blit(self.background, (0, 0))
+            pygame.draw.rect(self.screen, (0, 0, 0), self.screen.get_rect())
+            pygame.draw.line(self.screen, (255, 255, 255), (Game.AERIALPANE_W + 1, 0), (Game.AERIALPANE_W + 1, Game.SCREEN_H), 3)
 
             #Draw radar circles
-            pygame.draw.circle(self.screen, Config.RADAR_CIRC_COLOR, (Game.AERIALPANE_W / 2, Game.AERIALPANE_H / 2), Config.RADAR_RADIUS * 1/3, 1)
-            pygame.draw.circle(self.screen, Config.RADAR_CIRC_COLOR, (Game.AERIALPANE_W / 2, Game.AERIALPANE_H / 2), Config.RADAR_RADIUS * 2/3, 1)
-            pygame.draw.circle(self.screen, Config.RADAR_CIRC_COLOR, (Game.AERIALPANE_W / 2, Game.AERIALPANE_H / 2), Config.RADAR_RADIUS, 1)
+            pygame.draw.circle(self.screen, Game.RADAR_CIRC_COLOR, (Game.AERIALPANE_W / 2, Game.AERIALPANE_H / 2), Game.RADAR_RADIUS * 1/3, 1)
+            pygame.draw.circle(self.screen, Game.RADAR_CIRC_COLOR, (Game.AERIALPANE_W / 2, Game.AERIALPANE_H / 2), Game.RADAR_RADIUS * 2/3, 1)
+            pygame.draw.circle(self.screen, Game.RADAR_CIRC_COLOR, (Game.AERIALPANE_W / 2, Game.AERIALPANE_H / 2), Game.RADAR_RADIUS, 1)
 
             #Draw destinations
             for x in self.destinations:
                 x.draw(self.screen)
                 
+            #Draw obstacles
             for x in self.obstacles:
                 x.draw(self.screen)
 
             #Move/redraw/collide aircraft
             self.__update()
 
-            #Draw score/time indicators
-            sf_score = self.font.render("Score: " + str(self.score), True, Config.COLOR_SCORETIME)
-            self.screen.blit(sf_score, (820, 10))
+            #Draw black rect over RHS of screen, to occult bits of plane/obstacle that may be there
+            pygame.draw.rect(self.screen, (0, 0, 0), pygame.Rect((Game.FSPANE_LEFT, 0), (Game.SCREEN_W - 1 - Game.FSPANE_LEFT, Game.FSPANE_TOP - 4)))
+            pygame.draw.rect(self.screen, (0, 0, 0), pygame.Rect((Game.FSPANE_LEFT, Game.FSPANE_TOP), (Game.SCREEN_W - 1 - Game.FSPANE_LEFT, Game.SCREEN_H - Game.FSPANE_TOP)))
 
-            sf_time = self.font.render("Time: " + str( math.floor((Config.GAMETIME - self.ms_elapsed) / 1000) ), True, Config.COLOR_SCORETIME)
-            self.screen.blit(sf_time, (820, 40))
+            #Draw flightstrips
+            for n in range(0, len(self.aircraft)):
+                self.aircraft[n].drawFlightstrip(self.screen, pygame.Rect((Game.FSPANE_LEFT, Game.FSPANE_TOP + (n * Game.FS_H)), (Game.FS_W, Game.FS_H)))
+                              
+
+            #Draw score/time indicators
+            sf_score = self.font.render("Score: " + str(self.score), True, Game.COLOR_SCORETIME)
+            sf_time = self.font.render("Time: " + str( math.floor((Config.GAMETIME - self.ms_elapsed) / 1000) ), True, Game.COLOR_SCORETIME)
+
+            self.screen.blit(sf_score, (Game.FSPANE_LEFT + 30, 10))
+            self.screen.blit(sf_time, (Game.FSPANE_LEFT + 30, 40))
             
             
             #Recalc time and check for game end
             self.ms_elapsed = self.ms_elapsed + timepassed
             if(self.ms_elapsed >= Config.GAMETIME):
-                gameEnd = 1
+                gameEnd = Config.GAME_CODE_TIME_UP
                 
             #Flip the framebuffers
             pygame.display.flip()
 
-        return gameEnd
+        return (gameEnd, self.score)
             
     def __update(self):
 
@@ -110,7 +144,7 @@ class Game:
                 ac_removal.append(a)
                 self.score += Config.SCORE_REACHDEST
             else:
-                a.draw(self.screen, n)
+                a.draw(self.screen)
 
             #Check collisions
             for o in self.obstacles:
@@ -194,12 +228,9 @@ class Game:
             elif(event.type == pygame.MOUSEMOTION):
                 if(self.way_clicked != None):
                     self.way_clicked.setLocation(event.pos)
-            elif(event.type == pygame.QUIT):
-                ret = 2
-                break
             elif(event.type == pygame.KEYDOWN):
                 if(event.key == pygame.K_ESCAPE):
-                    ret = 2
+                    ret = Config.GAME_CODE_USER_END
                     break
         return ret
 
@@ -217,7 +248,7 @@ class Game:
         for i in range(0, len(self.aircraft)):
             ac = self.aircraft[i]
             distsq = ac.getClickDistanceSq(clickpos)
-            if( ac.clickedOnFlightstrip(clickpos, i) ):
+            if( ac.clickedOnFlightstrip(clickpos) ):
                 foundac = ac
                 break;
             elif( distsq < mindistsq ):

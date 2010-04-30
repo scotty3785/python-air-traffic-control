@@ -6,8 +6,8 @@ import os;
 import string;
 from config import *;
 from waypoint import *;
-from game import *;
 from utility import *;
+from game import *;
 
 class Aircraft:
 
@@ -22,6 +22,11 @@ class Aircraft:
     FS_FONT_COLOR_SELECTED = (50, 255, 50)
     FS_BG_COLOR_NORMAL = (60, 60, 60)
     FS_BG_COLOR_SELECTED = (60, 40, 255)
+
+    EVENT_CLICK_AC = 0
+    EVENT_CLICK_FS = 1
+    EVENT_CLICK_SPEED_UP = 2
+    EVENT_CLICK_SPEED_DOWN = 3
 
 	#Constructor!
     def __init__(self, location, speed, destination, ident):
@@ -85,7 +90,7 @@ class Aircraft:
             self.fs_bg_color = Aircraft.FS_BG_COLOR_NORMAL
 
 	#Draw myself on the screen at my current position and heading
-    def draw(self, surface, index):
+    def draw(self, surface):
         rot_image = pygame.transform.rotate(self.image, -self.heading)
         rect = rot_image.get_rect()
         rect.center = self.location
@@ -116,9 +121,6 @@ class Aircraft:
 			r = surface.blit(id, (x,y))
 			y = y - self.font.get_height()
 
-        #Draw flightstrip
-        self.__drawFlightstrip(surface, index)
-
 	#Location/heading update function
     def update(self):
         if(self.__reachedWaypoint(self.location, self.waypoints[0].getLocation())):
@@ -135,10 +137,11 @@ class Aircraft:
     def getClickDistanceSq(self, clickpos):
         return Utility.locDistSq(clickpos, self.location)
 
-    def clickedOnFlightstrip(self, clickpos, index):
-        top = 152 + (index * 50)
-        bottom = 152 + ((index + 1) * 50) - 1
-        if (clickpos[0] >= 798) and (top <= clickpos[1] <= bottom):
+    def clickedOnFlightstrip(self, clickpos):
+        return self.fs_rect.collidepoint(clickpos)
+
+    def __clickedOnAircraft(self, clickpos):
+        if(Utility.locDistSq(clickpos, self.location) <= 100):
             return True
         else:
             return False
@@ -165,22 +168,41 @@ class Aircraft:
             return False
 
     #Draw my flight strip at the given list index position
-    def __drawFlightstrip(self, surface, index):
-        #Calc bounds
-        left = 798
-        top = 152 + (index * 50)
-        bottom = 152 + ((index + 1) * 50) - 1
+    def drawFlightstrip(self, surface, rect):
+        self.fs_rect = rect
 
-        #Draw bottom line
-        pygame.draw.line(surface, (255, 255, 255), (left, bottom), (1023, bottom), 1)
+        #Calc bounds
+        left = rect.left
+        top = rect.top
+        bottom = rect.bottom
+        right = rect.right
 
         #Draw background
-        pygame.draw.rect(surface, self.fs_bg_color, pygame.Rect(left, top, 226, 49), 0)
+        pygame.draw.rect(surface, self.fs_bg_color, rect, 0)
+
+        #Draw bottom line
+        pygame.draw.line(surface, (255, 255, 255), (rect.left, rect.bottom - 1), (rect.right, rect.bottom - 1), 1)
 
         #Draw ident
         srf_ident = self.font.render(self.ident, False, self.fs_font_color)
-        surface.blit(srf_ident, (left + 5, top + 4))
+        surface.blit(srf_ident, (rect.left + 5, rect.top + 4))
 
         #Draw speed
         srf_speed = self.font.render(str(self.speed * Config.AC_SPEED_SCALEFACTOR) + "kts", False, self.fs_font_color)
-        surface.blit(srf_speed, (left + 5, top + 26))
+        surface.blit(srf_speed, (rect.left + 5, rect.top + 28))
+
+        #Draw speed controls
+        if(self.selected == True):
+            surface.blit(Aircraft.FS_IMAGE_SPEED_UP, (rect.left + 75, rect.top + 26))
+            surface.blit(Aircraft.FS_IMAGE_SPEED_DOWN, (rect.left + 93, rect.top + 26))
+
+    def click(self, clickpos, index):
+        if(self.__clickedOnFlightstrip(clickpos, index) == True):
+            if(self.__clickedOnSpeedUp(clickpos, index) == True):
+                return EVENT_CLICK_SPEED_UP
+            elif(self.__clickedOnSpeedDown(clickpos, index) == True):
+                return EVENT_CLICK_SPEED_DOWN
+            else:
+                return EVENT_CLICK_FS
+        elif(self.__clickedOnAircraft(clickpos, index) == True):
+            return EVENT_CLICK_AC

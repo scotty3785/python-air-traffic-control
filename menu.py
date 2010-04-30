@@ -129,14 +129,14 @@ class Menu:
             self.screen.blit(self.background, (0, 0))        
             
             #Draw + update radar
-            if(self.radar_angle == 0):
-                self.radar_angle = 359
-            else:
-                self.radar_angle -= Config.RADAR_SCAN_ANGLE
-            pygame.draw.circle(self.screen, Config.RADAR_CIRC_COLOR, (Menu.AERIALPANE_W / 2, Menu.AERIALPANE_H / 2), Config.RADAR_RADIUS * 1/3, 1)
-            pygame.draw.circle(self.screen, Config.RADAR_CIRC_COLOR, (Menu.AERIALPANE_W / 2, Menu.AERIALPANE_H / 2), Config.RADAR_RADIUS * 2/3, 1)
-            pygame.draw.circle(self.screen, Config.RADAR_CIRC_COLOR, (Menu.AERIALPANE_W / 2, Menu.AERIALPANE_H / 2), Config.RADAR_RADIUS, 1)
-            pygame.draw.line(self.screen, Config.RADAR_LINE_COLOR, (Menu.AERIALPANE_W / 2, Menu.AERIALPANE_H / 2), self.__calcRadarEndPoint(self.radar_angle), 3)
+            #if(self.radar_angle == 0):
+            #    self.radar_angle = 359
+            #else:
+            #    self.radar_angle -= Config.RADAR_SCAN_ANGLE
+            #pygame.draw.circle(self.screen, Config.RADAR_CIRC_COLOR, (Menu.AERIALPANE_W / 2, Menu.AERIALPANE_H / 2), Config.RADAR_RADIUS * 1/3, 1)
+            #pygame.draw.circle(self.screen, Config.RADAR_CIRC_COLOR, (Menu.AERIALPANE_W / 2, Menu.AERIALPANE_H / 2), Config.RADAR_RADIUS * 2/3, 1)
+            #pygame.draw.circle(self.screen, Config.RADAR_CIRC_COLOR, (Menu.AERIALPANE_W / 2, Menu.AERIALPANE_H / 2), Config.RADAR_RADIUS, 1)
+            #pygame.draw.line(self.screen, Config.RADAR_LINE_COLOR, (Menu.AERIALPANE_W / 2, Menu.AERIALPANE_H / 2), self.__calcRadarEndPoint(self.radar_angle), 3)
 
 			#Create Menu Items depending on current selection.
             shift0 = 0
