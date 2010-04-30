@@ -1,0 +1,10 @@
+default,190,Spiderman,None
+default,190,Spiderman,None
+default,180,Superman,None
+default,180,Superman,None
+default,180,Superman,None
+default,180,Superman,None
+default,175,Batman,None
+default,175,Batman,None
+default,120,Chuck,None
+default,115,Bill,None
