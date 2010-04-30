@@ -11,7 +11,6 @@ from pygame.locals import *
 if not pygame.font: print 'Warning, fonts disabled'
 if not pygame.mixer: print 'Warning, sound disabled'
 
-
 # Functions to create our resources
 def load_image(name, colorkey=None):
     fullname = os.path.join('data', name)
@@ -27,40 +26,39 @@ def load_image(name, colorkey=None):
         image.set_colorkey(colorkey, RLEACCEL)
     return image, image.get_rect()
 
-
 def drawtext(screen,text,font):
-	x = 50
-	y = 100
-	tmp = string.split(text,"\n")
-	tmp.reverse()
-	for line in tmp:
-		img = font.render(line,1,(30,30,30),(200,100,200))
-		rect = screen.blit(img, (x,y))
-		screen.fill(0, (rect.right, rect.top, 0, rect.height))
-		y = y - font.get_height()
+    x = 50
+    y = 100
+    tmp = string.split(text,"\n")
+    tmp.reverse()
+    for line in tmp:
+        img = font.render(line,1,(30,30,30),(200,100,200))
+        rect = screen.blit(img, (x,y))
+        screen.fill(0, (rect.right, rect.top, 0, rect.height))
+        y = y - font.get_height()
 
 class Waypoint(pygame.sprite.Sprite):
-	def __init__(self):
-		pygame.sprite.Sprite.__init__(self)
-		self.image, self.rect = load_image('asprite.bmp', -1)
-		self.pos = pygame.mouse.get_pos()
-		print "New waypoint inserted at:", self.pos
-		self.rect.center = self.pos
-		self.clicked = False
+    def __init__(self):
+        pygame.sprite.Sprite.__init__(self)
+        self.image, self.rect = load_image('asprite.bmp', -1)
+        self.pos = pygame.mouse.get_pos()
+        print "New waypoint inserted at:", self.pos
+        self.rect.center = self.pos
+        self.clicked = False
 
-	def update(self):
-		# Must change at least rect or image attribute to cause 
-		# sprite to be displayed
-		if self.clicked:
-			self.pos = pygame.mouse.get_pos()
-			self.rect.center = self.pos
-			pass
+    def update(self):
+        # Must change at least rect or image attribute to cause 
+        # sprite to be displayed
+        if self.clicked:
+            self.pos = pygame.mouse.get_pos()
+            self.rect.center = self.pos
+            pass
 
-	def click(self):
-		self.clicked = True
+    def click(self):
+        self.clicked = True
 
-	def unclick(self):
-		self.clicked = False
+    def unclick(self):
+        self.clicked = False
 
 	# Scott's code
 	#def waypoint_render(wps):
@@ -72,25 +70,24 @@ class Waypoint(pygame.sprite.Sprite):
 # A route is a collection of waypoints
 # Inheritance or aggregation of list? For now aggregation
 class Route(pygame.sprite.Sprite):
-	def __init__(self):
-		self.waypoints = []
-		self.pointlist = []
-
-	def draw(self,screen):
-		for i in range(1,len(self.waypoints)):
-			pygame.draw.line(screen, (255,0,0), self.waypoints[i-1].pos, self.waypoints[i].pos,2)
+    def __init__(self):
+        self.waypoints = []
+        self.pointlist = []
+    
+    def draw(self,screen):
+        for i in range(1,len(self.waypoints)):
+            pygame.draw.line(screen, (255,0,0), self.waypoints[i-1].pos, self.waypoints[i].pos,2)
 		# self.pointlist not updated when waypoints are moved so this doesn't work
 		#if (len(self.pointlist) > 1):
 		#	pygame.draw.lines(screen, (255,0,0), 0, self.pointlist, 2)
 
 
-	def addWaypoint(self, wp):
-		self.waypoints.append(wp)
-		self.pointlist.append(wp.pos)
+    def addWaypoint(self, wp):
+        self.waypoints.append(wp)
+        self.pointlist.append(wp.pos)
 
-	def delWaypoint(self, wp):
-		print "del waypoint"
-
+    def delWaypoint(self, wp):
+        print "del waypoint"
 
 def main():
     """this function is called when the program starts.
@@ -106,7 +103,7 @@ def main():
 # Create The Backgound
     background = pygame.Surface(screen.get_size())
     background = background.convert()
-	# Set the background colour
+# Set the background colour
     background.fill((0, 100, 0))
     
 # Display The Background
@@ -118,7 +115,7 @@ def main():
 
 # Prepare Game Objects
     clock = pygame.time.Clock()
-	# Create a group/container for all the waypoint sprites to be drawn
+# Create a group/container for all the waypoint sprites to be drawn
     waypoints = pygame.sprite.RenderUpdates()
 
     all_waypoints = []
@@ -129,30 +126,30 @@ def main():
         clock.tick(60)
 
     # Handle Input Events
-        for event in pygame.event.get():
-            if event.type == QUIT:
-                return
-            elif event.type == KEYDOWN and event.key == K_ESCAPE:
-                return
-            elif event.type == MOUSEBUTTONDOWN:
-				# Check if clicked on an existing waypoint
-				sprites_clicked = [sprite for sprite in route.waypoints #all_waypoints
-						if sprite.rect.collidepoint(pygame.mouse.get_pos())]
-				print sprites_clicked
-				# If not, then create a new one
-				if (not sprites_clicked):
-					w = Waypoint()
-					waypoints.add(w)
-					route.addWaypoint(w)
-					print route.waypoints
-					all_waypoints.append(w)
-				else:
-					print "sprite already exists"
-					sprites_clicked[0].click()
-            elif event.type == MOUSEBUTTONUP:
-				if (sprites_clicked):
-					sprites_clicked[0].unclick()
-				pass
+    for event in pygame.event.get():
+        if event.type == QUIT:
+            return
+        elif event.type == KEYDOWN and event.key == K_ESCAPE:
+            return
+        elif event.type == MOUSEBUTTONDOWN:
+            # Check if clicked on an existing waypoint
+            sprites_clicked = [sprite for sprite in route.waypoints #all_waypoints
+                    if sprite.rect.collidepoint(pygame.mouse.get_pos())]
+            print sprites_clicked
+            # If not, then create a new one
+            if (not sprites_clicked):
+                w = Waypoint()
+                waypoints.add(w)
+                route.addWaypoint(w)
+                print route.waypoints
+                all_waypoints.append(w)
+            else:
+                print "sprite already exists"
+                sprites_clicked[0].click()
+        elif event.type == MOUSEBUTTONUP:
+            if (sprites_clicked):
+                sprites_clicked[0].unclick()
+                pass
 
         waypoints.update()
         #route.update()
