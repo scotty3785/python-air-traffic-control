@@ -228,7 +228,7 @@ class Game:
             elif(event.type == pygame.KEYDOWN):
 
                 if(event.key == pygame.K_ESCAPE):
-                    ret = Config.GAME_CODE_USER_END
+                    ret = Config.GAME_CODE_KILL
                     break
 
         return ret

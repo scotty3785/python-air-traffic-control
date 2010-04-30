@@ -22,4 +22,7 @@ class Config:
 
     GAME_CODE_USER_END = 1
     GAME_CODE_TIME_UP = 2
+    GAME_CODE_START = 3
+    GAME_CODE_HIGH_SCORE = 4
+    GAME_CODE_KILL = -10
 

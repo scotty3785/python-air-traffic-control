@@ -27,22 +27,22 @@ class Main:
         while (exit == 0):
             menuEndCode = self.menu.start()
             print "Menu End Code: " + str(menuEndCode)
-            if (menuEndCode == "GO"):
+            if (menuEndCode == Config.GAME_CODE_START):
                 menuEndCode = 0
     	        (gameEndCode, score) = self.game.start()
-                if (gameEndCode == 1):
+                if (gameEndCode == Config.GAME_CODE_TIME_UP):
                 #Time has elapsed to go to make a high score entry
                     print "Make High Score Entry"
                     exit = 1 # For now exit the game if this is selected
-                elif (gameEndCode == 2):
+                elif (gameEndCode == Config.GAME_CODE_KILL):
                 #User has exited game for now exit the game if this is selected
                      exit = 1                
                      print "User Aborted Game"
-            elif (menuEndCode == 1):
+            elif (menuEndCode == Config.GAME_CODE_HIGH_SCORE):
             #Enter High Score Screen
                 print "High Score Screen"
                 exit = 1 # For now exit the game if this is selected
-            elif (menuEndCode == 2):
+            elif (menuEndCode == Config.GAME_CODE_KILL):
                  print "Game Ended from menu"
                  exit = 1           
 

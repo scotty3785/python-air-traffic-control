@@ -2,30 +2,6 @@ from high import *
 import pygame
 from pygame import *
 import os
-
-#hiScore = Highs('score.txt',10)
-#hiScore.load()
-#myScores = hiScore['default']
-#position = myScores.submit(190,"Spiderman",None)
-#for e in myScores:   
-#	print e.score,e.name
-#print "You came in position: " +str(position)
-#hiScore.save()
-
-#   File: high.py
-#   Description: An instance of the highscores screen
-
-def drawtext(screen,text,font):
-    x = 50
-    y = 100
-    tmp = string.split(text,"\n")
-    tmp.reverse()
-    for line in tmp:
-        img = font.render(line,1,(30,30,30),(200,100,200))
-        rect = screen.blit(img (x,y))
-        screen.fill(0, (rect.right, rect.top, 0, rect.height))
-        y = y - font.get_height()
-
 import pygame
 import os
 import math
@@ -42,6 +18,30 @@ BLACK = (0,0,0)
 GREY = (127, 127, 127)
 LGRAY = (200, 200, 200)
 DGRAY = (55, 55, 55)
+
+#hiScore = Highs('score.txt',10)
+#hiScore.load()
+#myScores = hiScore['default']
+#position = myScores.submit(190,"Spiderman",None)
+#for e in myScores:   
+#	print e.score,e.name
+#print "You came in position: " +str(position)
+#hiScore.save()
+
+#   File: high.py
+#   Description: An instance of the highscores screen
+
+def drawtext(screen,text,font):
+    x = 200
+    y = 200
+    tmp = string.split(text,"\n")
+    for line in tmp:
+        img = font.render(line,1,WHITE,BLACK)
+        rect = screen.blit(img,(x,y))
+        screen.fill(0, (rect.right, rect.top, 0, rect.height))
+        y = y + font.get_height()
+
+
 
 def texty(name,size):
     Texty = pygame.font.Font(name, size)
@@ -72,19 +72,6 @@ class HighScore:
         for event in pygame.event.get():
             if(event.type == pygame.MOUSEBUTTONDOWN):
                 print "Mouse Click: " + str(event.pos)
-                ret = self.__mouseMenuSelection(event.pos)
-                if (self.selection == 2):
-                    self.menuEnd = 2
-                elif (self.selection == 1):
-                    self.menuEnd = 1
-                elif (self.selection == 0):
-                    print "I clicked on start"
-                    self.menuEnd = "GO"
-                break
-            elif(event.type == pygame.MOUSEMOTION):
-                a = self.__mouseMenuOver(event.pos)
-                if (0 <= a <= 2):
-                    self.selection = a
             elif(event.type == pygame.QUIT):
                 self.menuEnd = 2
                 break
@@ -113,22 +100,24 @@ class HighScore:
         while self.menuEnd == 0:
             timepassed = clock.tick(Config.FRAMERATE)
             
-            #self.__handleUserInteraction()
+            self.__handleUserInteraction()
 
             #Draw background
             self.screen.blit(self.background, (0, 0))        
             
             #Draw Highscore Table
+            self.scoretable = ""
             for e in self.myScores:   
-            	self.scoretable += "%s       %s\n " % (e.name,e.score)
-
-            print self.scoretable
+            	self.scoretable += "%s       %s\n" % (e.name,e.score)
+            drawtext(self.background,self.scoretable,self.font)
             
 			#Draw Screen
             pygame.display.flip()
         return self.menuEnd
 
 if __name__ == '__main__':
+    display.init()
+    font.init()
     screen = display.set_mode((1024, 768))
 
     game_scores = HighScore(screen)

@@ -77,11 +77,11 @@ class Menu:
                 if (0 <= a <= 2):
                     self.selection = a
             elif(event.type == pygame.QUIT):
-                self.menuEnd = 2
+                self.menuEnd = Config.GAME_CODE_KILL
                 break
             elif(event.type == pygame.KEYDOWN):
                 if(event.key == pygame.K_ESCAPE):
-                    self.menuEnd = 2
+                    self.menuEnd = Config.GAME_CODE_KILL
                     break
                 elif(event.key == pygame.K_UP):
 					self.selection = (self.selection - 1) % 3
@@ -91,11 +91,11 @@ class Menu:
                     break
                 elif(event.key == pygame.K_SPACE):
                     if (self.selection == 2):
-                        self.menuEnd = 2
+                        self.menuEnd = Config.GAME_CODE_KILL
                     elif (self.selection == 1):
-                        self.menuEnd = 1
+                        self.menuEnd = Config.GAME_CODE_HIGH_SCORE
                     elif (self.selection == 0):
-                        self.menuEnd = 0
+                        self.menuEnd = Config.GAME_CODE_START
                     break
  
     def __calcRadarEndPoint(self, angle):
