@@ -125,42 +125,42 @@ def main():
     while 1:
         clock.tick(60)
 
-    # Handle Input Events
-    for event in pygame.event.get():
-        if event.type == QUIT:
-            return
-        elif event.type == KEYDOWN and event.key == K_ESCAPE:
-            return
-        elif event.type == MOUSEBUTTONDOWN:
-            # Check if clicked on an existing waypoint
-            sprites_clicked = [sprite for sprite in route.waypoints #all_waypoints
-                    if sprite.rect.collidepoint(pygame.mouse.get_pos())]
-            print sprites_clicked
-            # If not, then create a new one
-            if (not sprites_clicked):
-                w = Waypoint()
-                waypoints.add(w)
-                route.addWaypoint(w)
-                print route.waypoints
-                all_waypoints.append(w)
-            else:
-                print "sprite already exists"
-                sprites_clicked[0].click()
-        elif event.type == MOUSEBUTTONUP:
-            if (sprites_clicked):
-                sprites_clicked[0].unclick()
-                pass
+        # Handle Input Events
+        for event in pygame.event.get():
+            if event.type == QUIT:
+                return
+            elif event.type == KEYDOWN and event.key == K_ESCAPE:
+                return
+            elif event.type == MOUSEBUTTONDOWN:
+                # Check if clicked on an existing waypoint
+                sprites_clicked = [sprite for sprite in route.waypoints #all_waypoints
+                        if sprite.rect.collidepoint(pygame.mouse.get_pos())]
+                print sprites_clicked
+                # If not, then create a new one
+                if (not sprites_clicked):
+                    w = Waypoint()
+                    waypoints.add(w)
+                    route.addWaypoint(w)
+                    print route.waypoints
+                    all_waypoints.append(w)
+                else:
+                    print "sprite already exists"
+                    sprites_clicked[0].click()
+            elif event.type == MOUSEBUTTONUP:
+                if (sprites_clicked):
+                    sprites_clicked[0].unclick()
+                    pass
 
-        waypoints.update()
-        #route.update()
-
-    # Draw everything
-        screen.blit(background, (0, 0))
-        waypoints.draw(screen)
-        route.draw(screen)
-        drawtext(screen, ("ERJ145\nFL24\n140kts"),font)
-        pygame.display.flip()
-
+            waypoints.update()
+            #route.update()
+    
+        # Draw everything
+            screen.blit(background, (0, 0))
+            waypoints.draw(screen)
+            route.draw(screen)
+            drawtext(screen, ("ERJ145\nFL24\n140kts"),font)
+            pygame.display.flip()
+	
 # Game Over
 
 
