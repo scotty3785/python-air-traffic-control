@@ -54,4 +54,3 @@ class Main:
 if __name__ == '__main__':
     game_main = Main()
     game_main.run()
-    sys.path.append(
