@@ -21,5 +21,5 @@ class Config:
     AC_SPEED_SCALEFACTOR = 1000
 
     GAME_CODE_USER_END = 1
-    GAME_CORE_TIME_UP = 2
+    GAME_CODE_TIME_UP = 2
 

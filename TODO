@@ -22,8 +22,8 @@ Tom
 
 - Flight strip speed controls
 - Flight strip heading indicators
-- Waypoint addition
+- Waypoint addition                         +
 - Tidy up score/time fonts and background
 - Game end(/pause?) buttons
 - Tidy up event handling
-- Fullscreen and resolution-independence
+- Fullscreen and resolution-independence    +

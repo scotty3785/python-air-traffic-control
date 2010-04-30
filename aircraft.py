@@ -55,7 +55,7 @@ class Aircraft:
 	#Add a new waypoint in the specified index in the list
     def addWaypoint(self, waypoint, index=0):
         if((len(self.waypoints) - 1) <= Config.MAX_WAYPOINTS):
-            self.waypoints.insert(index, Waypoint(waypoint))
+            self.waypoints.insert(index, waypoint)
             self.heading = self.__calculateHeading(self.location, self.waypoints[0].getLocation())
 	
 	#Get the specified waypoint from the list

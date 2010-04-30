@@ -12,11 +12,7 @@ class Waypoint:
         return self.location
 
     def setLocation(self, location):
-        if(location[0] > Game.AERIALPANE_W):
-            self.location = (Game.AERIALPANE_W, location[1])
-        else:
-            self.location = location
-
+        self.location = location
         self.way_rect = pygame.Rect(self.location, (7, 7))
         self.way_rect.center = self.location
 
@@ -24,4 +20,4 @@ class Waypoint:
         pygame.draw.rect(surface, (0, 0, 255), self.way_rect, 0)
 
     def clickedOn(self, clickpos):
-        return (self.way_rect.collidepoint(clickpos))
+        return (self.way_rect.inflate(15,15).collidepoint(clickpos))
