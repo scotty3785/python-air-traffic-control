@@ -43,9 +43,9 @@ class Game:
         #Imagey type stuff
         self.font = pygame.font.Font(None, 30)
         self.screen = screen
-
-
+        
         #Aircraft/destination state vars
+        self.gameEndCode = 0
         self.ms_elapsed = 0
         self.score = 0
         self.aircraft = []
@@ -65,10 +65,9 @@ class Game:
 
     def start(self):
         clock = pygame.time.Clock()
-        gameEnd = 0
-        i = 0 
+
         #The main game loop
-        while gameEnd == 0:
+        while self.gameEndCode == 0:
             timepassed = clock.tick(Config.FRAMERATE)
 
             #Handle any UI stuff
@@ -122,12 +121,12 @@ class Game:
             #Recalc time and check for game end
             self.ms_elapsed = self.ms_elapsed + timepassed
             if(self.ms_elapsed >= Config.GAMETIME):
-                gameEnd = Config.GAME_CODE_TIME_UP
+                self.gameEndCode = Config.GAME_CODE_TIME_UP
                 
             #Flip the framebuffers
             pygame.display.flip()
 
-        return (gameEnd, self.score)
+        return (self.gameEndCode, self.score)
             
     def __update(self):
 
@@ -172,7 +171,6 @@ class Game:
 
 
     def __handleUserInteraction(self):
-        ret = 0
 
         for event in pygame.event.get():
 
@@ -227,10 +225,10 @@ class Game:
             elif(event.type == pygame.KEYDOWN):
 
                 if(event.key == pygame.K_ESCAPE):
-                    ret = Config.GAME_CODE_KILL
-                    break
-
-        return ret
+                    self.gameEndCode = Config.GAME_CODE_KILL
+        
+    def __callback_User_End(self):
+        self.gameEndCode = Config.GAME_CODE_USER_END
 
     def __handleObstacleCollision(self, ac, obs):
         if(obs.isPointInside(ac.getLocation()) == True):
