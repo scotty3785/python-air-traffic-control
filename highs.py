@@ -94,8 +94,13 @@ class HighScore:
                         self.menuEnd = 0
                     break
  
-    def start(self):               
+    def start(self,score):               
         clock = pygame.time.Clock()
+
+        if (score != ""):
+             print "Score Passed"
+        else:
+             print "No Score Passed"
   
         while self.menuEnd == 0:
             timepassed = clock.tick(Config.FRAMERATE)
@@ -113,6 +118,7 @@ class HighScore:
             
 			#Draw Screen
             pygame.display.flip()
+            
         return self.menuEnd
 
 if __name__ == '__main__':

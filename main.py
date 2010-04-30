@@ -3,6 +3,7 @@
 from pygame import *;
 from game import *;
 from menu import *;
+from highs import *
 import os;
 
 class Main:
@@ -23,6 +24,7 @@ class Main:
 
         self.menu = Menu(screen)
         self.game = Game(screen)
+        self.high = HighScore(screen)
 
     def run(self):
         #Display a menu
@@ -45,6 +47,7 @@ class Main:
             elif (menuEndCode == Config.GAME_CODE_HIGH_SCORE):
             #Enter High Score Screen
                 print "High Score Screen"
+                menuEndCode = self.high.start("")
                 exit = 1 # For now exit the game if this is selected
             elif (menuEndCode == Config.GAME_CODE_KILL):
                  print "Game Ended from menu"

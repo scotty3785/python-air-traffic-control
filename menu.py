@@ -19,7 +19,7 @@ LGRAY = (200, 200, 200)
 DGRAY = (55, 55, 55)
 
 def texty(name,size):
-    Texty = pygame.font.Font(name, size)
+    Texty = pygame.font.Font(None, size)
     return Texty
 
 class Menu:
@@ -70,7 +70,7 @@ class Menu:
                     self.menuEnd = 1
                 elif (self.selection == 0):
                     print "I clicked on start"
-                    self.menuEnd = "GO"
+                    self.menuEnd = Config.GAME_CODE_START
                 break
             elif(event.type == pygame.MOUSEMOTION):
                 a = self.__mouseMenuOver(event.pos)
