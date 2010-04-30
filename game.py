@@ -29,8 +29,6 @@ class Game:
 
     COLOR_SCORETIME = (20, 193, 236)    #Score/time counter colour
     
-    BUTTON_GAMEEND = pygame.image.load(os.path.join('data', 'button_end.png'))
-
     def __init__(self, screen):
         #Screen vars
         Game.SCREEN_W = screen.get_size()[0]
