@@ -109,17 +109,15 @@ class Aircraft:
             point_list.append(self.waypoints[-1].getLocation())
             pygame.draw.aalines(surface, (0, 0, 255), False, point_list)
 
-
 		# Draw the ident string next to the aircraft?
         x = self.location[0] + 20
-        y = self.location[1] + 20
+        y = self.location[1] 
         #list = string.split(self.ident,"\n")
         list = [self.ident, "FL" + str(self.altitude/100), str(self.speed * Config.AC_SPEED_SCALEFACTOR) + "kts"]
-        list.reverse()
         for line in list:
 			id = self.font.render(line, False, self.fs_font_color)
 			r = surface.blit(id, (x,y))
-			y = y - self.font.get_height()
+			y = y + self.font.get_height()
 
 	#Location/heading update function
     def update(self):
@@ -150,6 +148,7 @@ class Aircraft:
     def __calculateHeading(self, location, waypoint):
         x_diff = waypoint[0] - location[0]
         y_diff = waypoint[1] - location[1]
+		# Heading measured in degrees relative to North direction
         heading = math.degrees(math.atan2(y_diff, x_diff) + (math.pi / 2))
         return heading
 

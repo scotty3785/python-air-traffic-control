@@ -20,10 +20,16 @@ class Utility:
         return ( (dx ** 2) + (dy ** 2) )
 
     #Returns the point on a line segment between p1 and p2 that is closest to
-    #p3.
+    #p3; if such a point exists, the distance to that point is also returned
     @staticmethod
     def getPointLineIntersect(p1, p2, p3):
         if(p1 != p2):
+			# Simple geometry (best understood with a diagram):
+			# - all points P3 on perpendicular passing through P1 satisfy: (P1P3).(P1P2) = 0
+			# - all points P3 on perpendicular passing through P2 satisfy: (P1P3).(P1P2) = (P1P2).(P1P2)
+			# - all points outside these perpendiculars satisfy: (P1P3).(P1P2) = (P1P2).(P1P2) + (P2P3).(P1P2) > (P1P2).(P1P2) (assumes (P2P3).(P1P2) > 0)
+			# So for any point whose perpendicular to (P1P2) intersects inside segment [P1P2],
+			# the scalar product (P1P3).(P1P2) divided by (P1P2)^2 is between 0 and 1
             u_top = ((p3[0] - p1[0])*(p2[0] - p1[0])) + ((p3[1] - p1[1])*(p2[1] - p1[1]))
             u_bot = Utility.locDistSq(p1, p2)
             u = (u_top * 1.0) / (u_bot * 1.0)

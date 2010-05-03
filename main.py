@@ -50,6 +50,7 @@ class Main:
                 menuEndCode = self.high.start("")
                 exit = 1 # For now exit the game if this is selected
             elif (menuEndCode == Config.GAME_CODE_KILL):
+                 print Config.GAME_CODE_KILL
                  print "Game Ended from menu"
                  exit = 1           
 

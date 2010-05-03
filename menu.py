@@ -65,9 +65,9 @@ class Menu:
                 print "Mouse Click: " + str(event.pos)
                 ret = self.__mouseMenuSelection(event.pos)
                 if (self.selection == 2):
-                    self.menuEnd = 2
+                    self.menuEnd = Config.GAME_CODE_KILL
                 elif (self.selection == 1):
-                    self.menuEnd = 1
+					self.menuEnd = Config.GAME_CODE_HIGH_SCORE
                 elif (self.selection == 0):
                     print "I clicked on start"
                     self.menuEnd = Config.GAME_CODE_START
@@ -166,16 +166,3 @@ class Menu:
             #Draw Screen
             pygame.display.flip()
         return self.menuEnd
-
-
-
-
-
-
-
-
-
-
-
-
-

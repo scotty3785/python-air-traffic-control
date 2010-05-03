@@ -7,6 +7,7 @@ class Obstacle:
     TYPE_WEATHER = 0
     TYPE_NOFLY = 1
     TYPE_MOUNTAIN = 2
+    TYPE_ASHCLOUD = 3
 
     def __init__(self, obs_type, bounds):
         self.bounds = bounds

@@ -63,6 +63,9 @@ class Game:
         self.ac_selected = None
         self.way_clicked = None
 
+        # Double click
+        self.last_click_time = None
+
         #Generations functions
         self.__generateDestinations()
         self.__generateObstacles()
@@ -76,11 +79,12 @@ class Game:
             timepassed = clock.tick(Config.FRAMERATE)
 
             #Handle any UI stuff
-            gameEnd = self.__handleUserInteraction()
+            self.__handleUserInteraction()
 
+			# Deselect all aircraft first, the active one
             for a in self.aircraft:
                 a.setSelected(False)
-            
+           	# Then reselect the active aircraft 
             if(self.ac_selected != None):
                 self.ac_selected.setSelected(True)
             
@@ -179,6 +183,14 @@ class Game:
         for event in pygame.event.get():
 
             if(event.type == pygame.MOUSEBUTTONDOWN and event.button == 1):
+			# MOUSEBUTTONDOWN event has members pos and button
+                if (self.last_click_time and pygame.time.get_ticks() -  self.last_click_time < 800):
+                    dbl_click = True
+                    print "Double click detected"
+                else:
+                    dbl_click = False
+                    print "Single click detected"
+                self.last_click_time = pygame.time.get_ticks()
 
                 clickedac = self.__getACClickedOn(event.pos)
                 if(clickedac != None):
@@ -186,27 +198,34 @@ class Game:
                     self.ac_selected = clickedac
                 else:
                     if(self.ac_selected != None):
-                        #Not clicked aircraft, check waypoints for current selected ac
+                        #Not clicked aircraft, check waypoints of currently selected ac
                         wclick = False
                         for x in range(0, len(self.ac_selected.getWaypoints()) - 1):
                             w = self.ac_selected.getWaypoints()[x]
                             if(w.clickedOn(event.pos) == True):
-                                self.way_clicked = w
-                                wclick = True
+                                if (dbl_click):
+                                    # Use del list[index] instead?
+                                    self.ac_selected.waypoints.remove(w)     
+                                    print "Removed waypoint from list"
+                                    # Break mysteriously gets rid of problem (see clickedOn in destination.py)
+                                    wclick = True
+                                    break
+                                else:
+                                    self.way_clicked = w
+                                    wclick = True
                         if wclick == False:
                             #Not clicked waypoint, check lines
                             way_added = False
-                            wayps = self.ac_selected.getWaypoints()
-                            for x in range(-1, len(wayps) - 1):
-                                if(x == -1):
-                                    currP = self.ac_selected.getLocation()
-                                else:
-                                    currP = wayps[x].getLocation()
-                                nextP = wayps[x+1].getLocation()
+                            # Still not very Pythonesque...
+                            ac = self.ac_selected 
+                            list = [ac.getLocation()] + map(Waypoint.getLocation,ac.getWaypoints())
+                            for x in range(0, len(list)-1):
+                            	currP = list[x]
+                            	nextP = list[x+1]
                                 (intersect, dist) = Utility.getPointLineIntersect(currP, nextP, event.pos)
                                 if((intersect != None) and (dist <= 10)):
                                     newway = Waypoint(event.pos)
-                                    self.ac_selected.addWaypoint(newway, x+1)
+                                    self.ac_selected.addWaypoint(newway, x)
                                     self.way_clicked = newway
                                     way_added = True
                                     break
@@ -219,6 +238,7 @@ class Game:
                     self.way_clicked = None
 
             elif(event.type == pygame.MOUSEMOTION):
+			# MOUSEMOTION event has members pos, rel and buttons
 
                 if(self.way_clicked != None):
                     if(event.pos[0] >= Game.AERIALPANE_W - 3):
