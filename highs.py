@@ -5,7 +5,10 @@ import os
 import pygame
 import os
 import math
+import config
 from config import *
+import sys; sys.path.append("pgu")
+from pgu import high, gui
 
 RED = (255,0,0)
 MAGENTA = (255, 56, 156)
@@ -18,15 +21,6 @@ BLACK = (0,0,0)
 GREY = (127, 127, 127)
 LGRAY = (200, 200, 200)
 DGRAY = (55, 55, 55)
-
-#hiScore = Highs('score.txt',10)
-#hiScore.load()
-#myScores = hiScore['default']
-#position = myScores.submit(190,"Spiderman",None)
-#for e in myScores:   
-#	print e.score,e.name
-#print "You came in position: " +str(position)
-#hiScore.save()
 
 #   File: high.py
 #   Description: An instance of the highscores screen
@@ -60,7 +54,7 @@ class HighScore:
         self.background = pygame.image.load(os.path.join('data', 'backdrop.png'))
         self.font = pygame.font.Font(None, 30)
         #self.font = pygame.font.Font(None, 30)
-        self.menuEnd = 0
+        self.highEnd = 0
         self.selection = 0
         self.hiScore = Highs('score.txt',10)
         self.hiScore.load()
@@ -73,53 +67,57 @@ class HighScore:
             if(event.type == pygame.MOUSEBUTTONDOWN):
                 print "Mouse Click: " + str(event.pos)
             elif(event.type == pygame.QUIT):
-                self.menuEnd = 2
+                self.highEnd = GAME_CODE_MENU
                 break
             elif(event.type == pygame.KEYDOWN):
                 if(event.key == pygame.K_ESCAPE):
-                    self.menuEnd = 2
-                    break
-                elif(event.key == pygame.K_UP):
-					self.selection = (self.selection - 1) % 3
-					break
-                elif(event.key == pygame.K_DOWN):
-                    self.selection = (self.selection + 1) % 3
-                    break
-                elif(event.key == pygame.K_SPACE):
-                    if (self.selection == 2):
-                        self.menuEnd = 2
-                    elif (self.selection == 1):
-                        self.menuEnd = 1
-                    elif (self.selection == 0):
-                        self.menuEnd = 0
+                    self.highEnd = Config.GAME_CODE_MENU
                     break
  
     def start(self,score):               
         clock = pygame.time.Clock()
 
-        if (score != ""):
+        if (score > 0):
              print "Score Passed"
+             app = gui.Desktop()
+             app.connect(gui.QUIT,app.quit,None)
+             main = gui.Container(width=500, height=400) #, background=(220, 220, 220) )
+             main.add(gui.Label("New Highscore!!!", cls="h1"), 20, 20)
+             td_style = {'padding_right': 10}
+             t = gui.Table()
+             t.tr()
+             t.td( gui.Label('Type your name:') , style=td_style )
+             userName = gui.Input()
+             t.tr()
+             t.td( userName, style=td_style )
+             b = gui.Button("Done")
+             b.connect(gui.CLICK,app.quit,None)
+             t.td( b, style=td_style )
+             main.add(t, 20, 100)
+             app.run(main)
+             if (userName.value != ""):
+                   position = self.myScores.submit(score,userName.value,None)
         else:
              print "No Score Passed"
   
-        while self.menuEnd == 0:
-            timepassed = clock.tick(Config.FRAMERATE)
+        #Draw background
+        self.screen.blit(self.background, (0, 0))        
             
-            self.__handleUserInteraction()
-
-            #Draw background
-            self.screen.blit(self.background, (0, 0))        
-            
-            #Draw Highscore Table
-            self.scoretable = ""
-            for e in self.myScores:   
-            	self.scoretable += "%s       %s\n" % (e.name,e.score)
+        #Draw Highscore Table
+        self.scoretable = ""
+        for e in self.myScores:   
+            self.scoretable += "%s       %s\n" % (e.name,e.score)
             drawtext(self.background,self.scoretable,self.font)
             
-			#Draw Screen
+            #Draw Screen
             pygame.display.flip()
-            
-        return self.menuEnd
+        self.hiScore.save()
+        while (self.highEnd):
+            self.__handleUserInteraction()
+            drawtext(self.background,self.scoretable,self.font)
+            #Draw Screen
+            pygame.display.flip()
+        return self.highEnd
 
 if __name__ == '__main__':
     display.init()
@@ -127,7 +125,7 @@ if __name__ == '__main__':
     screen = display.set_mode((1024, 768))
 
     game_scores = HighScore(screen)
-    game_scores.start()
+    game_scores.start(200)
 
 
 

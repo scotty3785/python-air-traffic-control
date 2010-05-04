@@ -67,7 +67,11 @@ class Menu:
                 if (self.selection == 2):
                     self.menuEnd = Config.GAME_CODE_KILL
                 elif (self.selection == 1):
+<<<<<<< .mine
+                    self.menuEnd = Config.GAME_CODE_HIGH_SCORE
+=======
 					self.menuEnd = Config.GAME_CODE_HIGH_SCORE
+>>>>>>> .r58
                 elif (self.selection == 0):
                     print "I clicked on start"
                     self.menuEnd = Config.GAME_CODE_START
@@ -119,6 +123,8 @@ class Menu:
         erectpos = (0,420)
 
         clock = pygame.time.Clock()
+        
+        self.menuEnd = 0
   
         while self.menuEnd == 0:
             timepassed = clock.tick(Config.FRAMERATE)
@@ -128,17 +134,7 @@ class Menu:
             #Draw background
             self.screen.blit(self.background, (0, 0))        
             
-            #Draw + update radar
-            #if(self.radar_angle == 0):
-            #    self.radar_angle = 359
-            #else:
-            #    self.radar_angle -= Config.RADAR_SCAN_ANGLE
-            #pygame.draw.circle(self.screen, Config.RADAR_CIRC_COLOR, (Menu.AERIALPANE_W / 2, Menu.AERIALPANE_H / 2), Config.RADAR_RADIUS * 1/3, 1)
-            #pygame.draw.circle(self.screen, Config.RADAR_CIRC_COLOR, (Menu.AERIALPANE_W / 2, Menu.AERIALPANE_H / 2), Config.RADAR_RADIUS * 2/3, 1)
-            #pygame.draw.circle(self.screen, Config.RADAR_CIRC_COLOR, (Menu.AERIALPANE_W / 2, Menu.AERIALPANE_H / 2), Config.RADAR_RADIUS, 1)
-            #pygame.draw.line(self.screen, Config.RADAR_LINE_COLOR, (Menu.AERIALPANE_W / 2, Menu.AERIALPANE_H / 2), self.__calcRadarEndPoint(self.radar_angle), 3)
-
-			#Create Menu Items depending on current selection.
+            #Create Menu Items depending on current selection.
             shift0 = 0
             shift1 = 0
             shift2 = 0
