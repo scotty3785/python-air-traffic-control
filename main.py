@@ -37,7 +37,6 @@ class Main:
         state = STATE_MENU
         exit = 0
         while (exit == 0):
-<<<<<<< .mine
              if (state == STATE_MENU):
                  menuEndCode = None
                  menuEndCode = self.menu.start()
@@ -63,54 +62,7 @@ class Main:
                  print "Exiting High Score Screen" 
              elif (state == STATE_KILL):
                  exit = 1
-=======
-            menuEndCode = self.menu.start()
-            print "Menu End Code: " + str(menuEndCode)
-            if (menuEndCode == Config.GAME_CODE_START):
-                menuEndCode = 0
-    	        (gameEndCode, score) = self.game.start()
-                if (gameEndCode == Config.GAME_CODE_TIME_UP):
-                #Time has elapsed to go to make a high score entry
-                    print "Make High Score Entry"
-                    exit = 1 # For now exit the game if this is selected
-                elif (gameEndCode == Config.GAME_CODE_KILL):
-                #User has exited game for now exit the game if this is selected
-                     exit = 1                
-                     print "User Aborted Game"
-            elif (menuEndCode == Config.GAME_CODE_HIGH_SCORE):
-            #Enter High Score Screen
-                print "High Score Screen"
-                menuEndCode = self.high.start("")
-                exit = 1 # For now exit the game if this is selected
-            elif (menuEndCode == Config.GAME_CODE_KILL):
-                 print Config.GAME_CODE_KILL
-                 print "Game Ended from menu"
-                 exit = 1           
->>>>>>> .r58
 
-#            
-#            print "Menu End Code: " + str(menuEndCode)
-#            if (menuEndCode == Config.GAME_CODE_START):
-#    	        (gameEndCode, score) = self.game.start()
-#                if ((gameEndCode == Config.GAME_CODE_TIME_UP) and (score != 0)):
-#                #Time has elapsed to go to make a high score entry
-#                    print "Make High Score Entry"
-#                    menuEndCode = Config.GAME_CODE_MENU
-#                    highEndCode = self.high.start(score)
-#                    score = ""
-#                    #exit = 1 # For now exit the game if this is selected
-#                elif (gameEndCode == Config.GAME_CODE_KILL):
-#                #User has exited game for now exit the game if this is selected
-#                     exit = 1                
-#                     print "User Aborted Game"
-#            
-#            if (menuEndCode == Config.GAME_CODE_HIGH_SCORE):
-#            #Enter High Score Screen
-#                print "High Score Screen"
-#                highEndCode = self.high.start("")
-#            elif (menuEndCode == Config.GAME_CODE_KILL):
-#                 print "Game Ended from menu"
-#                 exit = 1           
 
 
 if __name__ == '__main__':
