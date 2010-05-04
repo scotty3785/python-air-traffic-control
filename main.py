@@ -63,8 +63,6 @@ class Main:
              elif (state == STATE_KILL):
                  exit = 1
 
-
-
 if __name__ == '__main__':
     game_main = Main()
     game_main.run()

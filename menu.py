@@ -67,11 +67,8 @@ class Menu:
                 if (self.selection == 2):
                     self.menuEnd = Config.GAME_CODE_KILL
                 elif (self.selection == 1):
-<<<<<<< .mine
                     self.menuEnd = Config.GAME_CODE_HIGH_SCORE
-=======
-					self.menuEnd = Config.GAME_CODE_HIGH_SCORE
->>>>>>> .r58
+                    self.menuEnd = Config.GAME_CODE_HIGH_SCORE
                 elif (self.selection == 0):
                     print "I clicked on start"
                     self.menuEnd = Config.GAME_CODE_START
