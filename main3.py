@@ -5,6 +5,7 @@ Demonstrate how to create a menu for user selection
 
 # Import Modules
 import os, sys, pygame, string
+from game import * 
 from pygame.locals import *
 
 if not pygame.font: print 'Warning, fonts disabled'
@@ -35,10 +36,16 @@ class Button:
             self.img = self.normal
             return False
 
-    def callback(self):
+    def callback(self,x=None):
+        #if self.cb:
+        #    self.cb("Clicked on " + self.text + "\n")
+        #    pass
         if self.cb:
-            self.cb("Clicked on " + self.text + "\n")
-            pass
+            if x:
+                self.cb(x)
+            else:
+                self.cb()
+
 
     def update(self):
         pass
@@ -52,7 +59,7 @@ def main():
 
 # Initialize Everything
     pygame.init()
-    screen = pygame.display.set_mode((468, 468))
+    screen = pygame.display.set_mode((1024, 768))
     pygame.display.set_caption('Menu test')
     pygame.mouse.set_visible(1)
 
@@ -78,10 +85,12 @@ def main():
     # statements like here. Bad hack: http://www.p-nand-q.com/python/stupid_lambda_tricks.html
     #l = lambda x: sys.stdout.write(x)
     # Don't need to use lambda functions... simple function will do
-    def f(x): print(x)
-    startButton = Button((100,100),"Start game", f) 
-    scoresButton = Button((100,150),"Show high scores", f)
-    quitButton = Button((100,200),"Quit", f)
+    def startButtonCb(screen): g = Game(screen); g.start()
+    def scoresButtonCb(): print "Clicked on start game"
+    def quitButtonCb(): print "Clicked on start game"
+    startButton = Button((100,100),"Start game", startButtonCb) 
+    scoresButton = Button((100,150),"Show high scores", scoresButtonCb)
+    quitButton = Button((100,200),"Quit", quitButtonCb)
     
     startButton.draw(screen)
     scoresButton.draw(screen)
@@ -109,7 +118,7 @@ def main():
                     pass
             elif event.type == MOUSEBUTTONDOWN:
                 if startButton.mouseOver(event.pos):
-                    startButton.callback()
+                    startButton.callback(screen)
                 elif scoresButton.mouseOver(event.pos):
                     scoresButton.callback()
                 elif quitButton.mouseOver(event.pos):
