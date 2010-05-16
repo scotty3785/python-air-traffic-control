@@ -1,8 +1,6 @@
 #   File: game.py
 #   Description: An instance of one game of ATC
-import sys
-sys.path.append('pgu');
-from pgu import gui;
+
 import pygame;
 import random;
 from config import *;
@@ -45,10 +43,7 @@ class Game:
         #Imagey type stuff
         self.font = pygame.font.Font(None, 30)
         self.screen = screen
-        
-        self.btn_end = gui.Button(value="End Game")
-        self.btn_end.connect(gui.CLICK, self.__callback_User_End)
-        
+               
         #Aircraft/destination state vars
         self.gameEndCode = 0
         self.ms_elapsed = 0
@@ -122,9 +117,7 @@ class Game:
             sf_time = self.font.render("Time: " + str( math.floor((Config.GAMETIME - self.ms_elapsed) / 1000) ), True, Game.COLOR_SCORETIME)
 
             self.screen.blit(sf_score, (Game.FSPANE_LEFT + 30, 10))
-            self.screen.blit(sf_time, (Game.FSPANE_LEFT + 30, 40))
-            
-            #Draw game end button
+            self.screen.blit(sf_time, (Game.FSPANE_LEFT + 30, 40))                    
             
             #Recalc time and check for game end
             self.ms_elapsed = self.ms_elapsed + timepassed
@@ -133,6 +126,13 @@ class Game:
                 
             #Flip the framebuffers
             pygame.display.flip()
+
+        if(self.gameEndCode == Config.GAME_CODE_AC_COLLIDE):
+            #TODO Popup game over window
+            pass
+        elif(self.gameEndCode == Config.GAME_CODE_TIME_UP):
+            #TODO Popup game over window
+            pass
 
         return (self.gameEndCode, self.score)
             
@@ -186,10 +186,8 @@ class Game:
 			# MOUSEBUTTONDOWN event has members pos and button
                 if (self.last_click_time and pygame.time.get_ticks() -  self.last_click_time < 800):
                     dbl_click = True
-                    print "Double click detected"
                 else:
                     dbl_click = False
-                    print "Single click detected"
                 self.last_click_time = pygame.time.get_ticks()
 
                 clickedac = self.__getACClickedOn(event.pos)
@@ -206,8 +204,6 @@ class Game:
                                 if (dbl_click):
                                     # Use del list[index] instead?
                                     self.ac_selected.waypoints.remove(w)     
-                                    print "Removed waypoint from list"
-                                    # Break mysteriously gets rid of problem (see clickedOn in destination.py)
                                     wclick = True
                                     break
                                 else:
@@ -249,10 +245,13 @@ class Game:
             elif(event.type == pygame.KEYDOWN):
 
                 if(event.key == pygame.K_ESCAPE):
-                    self.gameEndCode = Config.GAME_CODE_KILL
+                    self.gameEndCode = Config.GAME_CODE_USER_END
         
     def __callback_User_End(self):
         self.gameEndCode = Config.GAME_CODE_USER_END
+
+    def __callback_AC_Collide(self, ac1, ac2):
+        self.gameEndCode = Config.GAME_CODE_AC_COLLIDE
 
     def __handleObstacleCollision(self, ac, obs):
         if(obs.isPointInside(ac.getLocation()) == True):
