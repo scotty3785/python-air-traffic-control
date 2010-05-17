@@ -24,5 +24,6 @@ Tom
 - Flight strip heading indicators
 - Waypoint addition                         +
 - Tidy up score/time fonts and background
-- Game end(/pause?) buttons
+- Game end button                           +
 - Fullscreen and resolution-independence    +
+- Obstacles

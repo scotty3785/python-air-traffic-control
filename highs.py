@@ -51,7 +51,8 @@ class HighScore:
     def __init__(self, screen):
 		#Imagey type stuff
         self.screen = screen
-        self.background = pygame.image.load(os.path.join('data', 'backdrop.png'))
+        self.SCREEN_W = screen.get_size()[0]
+        self.SCREEN_H = screen.get_size()[1]
         self.font = pygame.font.Font(None, 30)
         #self.font = pygame.font.Font(None, 30)
         self.highEnd = 0
@@ -101,20 +102,20 @@ class HighScore:
              print "No Score Passed"
   
         #Draw background
-        self.screen.blit(self.background, (0, 0))        
+        pygame.draw.rect(self.screen, (0, 0, 0), pygame.Rect(0, 0, self.SCREEN_W, self.SCREEN_H))  
             
         #Draw Highscore Table
         self.scoretable = ""
         for e in self.myScores:   
             self.scoretable += "%s       %s\n" % (e.name,e.score)
-            drawtext(self.background,self.scoretable,self.font)
+            drawtext(self.screen,self.scoretable,self.font)
             
             #Draw Screen
             pygame.display.flip()
         self.hiScore.save()
         while (self.highEnd):
             self.__handleUserInteraction()
-            drawtext(self.background,self.scoretable,self.font)
+            drawtext(self.screen,self.scoretable,self.font)
             #Draw Screen
             pygame.display.flip()
         return self.highEnd

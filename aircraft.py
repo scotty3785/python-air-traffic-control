@@ -14,9 +14,6 @@ class Aircraft:
     AC_IMAGE_NORMAL = pygame.image.load(os.path.join('data', 'aircraft.png'))
     AC_IMAGE_SELECTED = pygame.image.load(os.path.join('data', 'aircraft_sel.png'))
 
-    FS_IMAGE_SPEED_UP = pygame.image.load(os.path.join('data', 'arrow_up.png'))
-    FS_IMAGE_SPEED_DOWN = pygame.image.load(os.path.join('data', 'arrow_down.png'))
-
     FS_FONTSIZE = 18
     FS_FONT_COLOR_NORMAL = (255, 255, 255)
     FS_FONT_COLOR_SELECTED = (50, 255, 50)
@@ -43,8 +40,6 @@ class Aircraft:
 
         Aircraft.AC_IMAGE_NORMAL.convert_alpha()
         Aircraft.AC_IMAGE_SELECTED.convert_alpha()
-        Aircraft.FS_IMAGE_SPEED_UP.convert_alpha()
-        Aircraft.FS_IMAGE_SPEED_DOWN.convert_alpha()
 
         #Image/font vars
         self.image = Aircraft.AC_IMAGE_NORMAL
@@ -190,18 +185,8 @@ class Aircraft:
         srf_speed = self.font.render(str(self.speed * Config.AC_SPEED_SCALEFACTOR) + "kts", False, self.fs_font_color)
         surface.blit(srf_speed, (rect.left + 5, rect.top + 28))
 
-        #Draw speed controls
-        if(self.selected == True):
-            surface.blit(Aircraft.FS_IMAGE_SPEED_UP, (rect.left + 75, rect.top + 26))
-            surface.blit(Aircraft.FS_IMAGE_SPEED_DOWN, (rect.left + 93, rect.top + 26))
-
     def click(self, clickpos, index):
         if(self.__clickedOnFlightstrip(clickpos, index) == True):
-            if(self.__clickedOnSpeedUp(clickpos, index) == True):
-                return EVENT_CLICK_SPEED_UP
-            elif(self.__clickedOnSpeedDown(clickpos, index) == True):
-                return EVENT_CLICK_SPEED_DOWN
-            else:
-                return EVENT_CLICK_FS
+            return EVENT_CLICK_FS
         elif(self.__clickedOnAircraft(clickpos, index) == True):
             return EVENT_CLICK_AC

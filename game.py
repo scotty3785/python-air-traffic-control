@@ -9,6 +9,7 @@ from aircraft import *;
 from obstacle import *;
 from aircraftspawnevent import *;
 from utility import *;
+from pgu import gui;
 
 class Game:
 
@@ -66,6 +67,15 @@ class Game:
         self.__generateObstacles()
         self.__generateAircraftSpawnEvents()
 
+        self.app = gui.App()
+        self.cnt_main = gui.Container(align=-1,valign=-1)
+        
+        self.btn_game_end = gui.Button(value="End Game", width=Game.FS_W-3, height=60)
+        self.btn_game_end.connect(gui.CLICK, self.__callback_User_End)
+        self.cnt_main.add(self.btn_game_end, Game.FSPANE_LEFT, Game.FSPANE_TOP - 65)
+
+        self.app.init(self.cnt_main, self.screen)
+
     def start(self):
         clock = pygame.time.Clock()
 
@@ -117,7 +127,7 @@ class Game:
             sf_time = self.font.render("Time: " + str( math.floor((Config.GAMETIME - self.ms_elapsed) / 1000) ), True, Game.COLOR_SCORETIME)
 
             self.screen.blit(sf_score, (Game.FSPANE_LEFT + 30, 10))
-            self.screen.blit(sf_time, (Game.FSPANE_LEFT + 30, 40))                    
+            self.screen.blit(sf_time, (Game.FSPANE_LEFT + 30, 40))
             
             #Recalc time and check for game end
             self.ms_elapsed = self.ms_elapsed + timepassed
@@ -125,14 +135,12 @@ class Game:
                 self.gameEndCode = Config.GAME_CODE_TIME_UP
                 
             #Flip the framebuffers
+            self.app.repaint()
+            self.app.update(self.screen)
             pygame.display.flip()
 
-        if(self.gameEndCode == Config.GAME_CODE_AC_COLLIDE):
-            #TODO Popup game over window
-            pass
-        elif(self.gameEndCode == Config.GAME_CODE_TIME_UP):
-            #TODO Popup game over window
-            pass
+        #Game over, display game over message
+        self.__displayPostGameDialog()
 
         return (self.gameEndCode, self.score)
             
@@ -181,6 +189,8 @@ class Game:
     def __handleUserInteraction(self):
 
         for event in pygame.event.get():
+
+            self.app.event(event)
 
             if(event.type == pygame.MOUSEBUTTONDOWN and event.button == 1):
 			# MOUSEBUTTONDOWN event has members pos and button
@@ -245,13 +255,10 @@ class Game:
             elif(event.type == pygame.KEYDOWN):
 
                 if(event.key == pygame.K_ESCAPE):
-                    self.gameEndCode = Config.GAME_CODE_USER_END
+                    self.gameEndCode = Config.CODE_KILL
         
     def __callback_User_End(self):
         self.gameEndCode = Config.GAME_CODE_USER_END
-
-    def __callback_AC_Collide(self, ac1, ac2):
-        self.gameEndCode = Config.GAME_CODE_AC_COLLIDE
 
     def __handleObstacleCollision(self, ac, obs):
         if(obs.isPointInside(ac.getLocation()) == True):
@@ -259,6 +266,7 @@ class Game:
 
     def __handleAircraftCollision(self, ac1, ac2):
         if( Utility.locDistSq(ac1.getLocation(), ac2.getLocation()) < (Config.AC_COLLISION_RADIUS ** 2) ):
+            self.gameEndCode = Config.GAME_CODE_AC_COLLIDE
             self.score += Config.SCORE_AC_COLLIDE
 
     def __getACClickedOn(self, clickpos):
@@ -306,4 +314,21 @@ class Game:
         elif side == 4:
             loc = (0, random.randint(0, Game.AERIALPANE_H))
         return loc
+
+    def __displayPostGameDialog(self):
+        #Do post-loop actions (game over dialogs)
+        if(self.gameEndCode != Config.GAME_CODE_USER_END and self.gameEndCode != Config.CODE_KILL):
+            l = gui.Label("Game Over!")
+            c = gui.Container()
+
+            if(self.gameEndCode == Config.GAME_CODE_AC_COLLIDE):
+                c.add(gui.Label("COLLISION!!!!"), 0, 0)
+            elif(self.gameEndCode == Config.GAME_CODE_TIME_UP):
+                c.add(gui.Label("Time up!"), 0, 0)
+
+            d = gui.Dialog(l, c)
+            d.open()
+            self.app.update(self.screen)
+            pygame.display.flip()
+            pygame.time.delay(3000)
 

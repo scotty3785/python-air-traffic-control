@@ -21,45 +21,43 @@ class Main:
         font.init()
         
         if(Config.GAME_FULLSCREEN == True):
-            screen = display.set_mode((0, 0), pygame.FULLSCREEN)
+            self.screen = display.set_mode((0, 0), pygame.FULLSCREEN)
         else:
-            screen = display.set_mode((1024, 768))
+            self.screen = display.set_mode((1024, 768))
             
         display.set_caption('ATC Version 0.1')
 
-        self.menu = Menu(screen)
-        self.game = Game(screen)
-        self.high = HighScore(screen)
+        self.menu = Menu(self.screen)
+        self.high = HighScore(self.screen)
 
     def run(self):
-        #Display a menu
-        #
         state = STATE_MENU
         exit = 0
         while (exit == 0):
              if (state == STATE_MENU):
                  menuEndCode = None
                  menuEndCode = self.menu.start()
-                 if (menuEndCode == Config.GAME_CODE_START):
+                 if (menuEndCode == Config.MENU_CODE_START):
                      state = STATE_GAME
-                 elif (menuEndCode == Config.GAME_CODE_HIGH_SCORE):
-                     score = 0
+                 elif (menuEndCode == Config.MENU_CODE_HIGH_SCORE):
                      state = STATE_HIGH
-                 elif (menuEndCode == Config.GAME_CODE_KILL):
+                 elif (menuEndCode == Config.CODE_KILL):
                      state = STATE_KILL
              elif (state == STATE_GAME):
-                 (gameEndCode, score) = self.game.start()
+                 game = Game(self.screen)
+                 (gameEndCode, score) = game.start()
                  if (gameEndCode == Config.GAME_CODE_TIME_UP):
                      state = STATE_HIGH
-                 elif (gameEndCode == Config.GAME_CODE_KILL):
+                 elif (gameEndCode == Config.CODE_KILL):
                      state = STATE_KILL
                  elif (gameEndCode == Config.GAME_CODE_USER_END):
-                     state = STATE_MENU 
+                     state = STATE_MENU
+                 elif (gameEndCode == Config.GAME_CODE_AC_COLLIDE):
+                     state = STATE_HIGH
              elif (state == STATE_HIGH):
+                 score = 0
                  highEndCode = self.high.start(score)
                  state = STATE_MENU
-                 score = 0
-                 print "Exiting High Score Screen" 
              elif (state == STATE_KILL):
                  exit = 1
 

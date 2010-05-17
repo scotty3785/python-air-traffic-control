@@ -30,11 +30,11 @@ class Menu:
     STRIPPANE_H = 44
 
     def __init__(self, screen):
+        self.SCREEN_W = screen.get_size()[0]
+        self.SCREEN_H = screen.get_size()[1]
 		#Imagey type stuff
-        self.background = pygame.image.load(os.path.join('data', 'backdrop.png'))
         self.font = pygame.font.Font(None, 30)
         self.screen = screen
-        self.radar_angle = 0
         self.menuEnd = 0
         self.selection = 0
         #Initialisation Stuff Done
@@ -65,24 +65,24 @@ class Menu:
                 print "Mouse Click: " + str(event.pos)
                 ret = self.__mouseMenuSelection(event.pos)
                 if (self.selection == 2):
-                    self.menuEnd = Config.GAME_CODE_KILL
+                    self.menuEnd = Config.CODE_KILL
                 elif (self.selection == 1):
-                    self.menuEnd = Config.GAME_CODE_HIGH_SCORE
-                    self.menuEnd = Config.GAME_CODE_HIGH_SCORE
+                    self.menuEnd = Config.MENU_CODE_HIGH_SCORE
+                    self.menuEnd = Config.MENU_CODE_HIGH_SCORE
                 elif (self.selection == 0):
                     print "I clicked on start"
-                    self.menuEnd = Config.GAME_CODE_START
+                    self.menuEnd = Config.MENU_CODE_START
                 break
             elif(event.type == pygame.MOUSEMOTION):
                 a = self.__mouseMenuOver(event.pos)
                 if (0 <= a <= 2):
                     self.selection = a
             elif(event.type == pygame.QUIT):
-                self.menuEnd = Config.GAME_CODE_KILL
+                self.menuEnd = Config.CODE_KILL
                 break
             elif(event.type == pygame.KEYDOWN):
                 if(event.key == pygame.K_ESCAPE):
-                    self.menuEnd = Config.GAME_CODE_KILL
+                    self.menuEnd = Config.CODE_KILL
                     break
                 elif(event.key == pygame.K_UP):
 					self.selection = (self.selection - 1) % 3
@@ -92,11 +92,11 @@ class Menu:
                     break
                 elif(event.key == pygame.K_SPACE):
                     if (self.selection == 2):
-                        self.menuEnd = Config.GAME_CODE_KILL
+                        self.menuEnd = Config.CODE_KILL
                     elif (self.selection == 1):
-                        self.menuEnd = Config.GAME_CODE_HIGH_SCORE
+                        self.menuEnd = Config.MENU_CODE_HIGH_SCORE
                     elif (self.selection == 0):
-                        self.menuEnd = Config.GAME_CODE_START
+                        self.menuEnd = Config.MENU_CODE_START
                     break
  
     def __calcRadarEndPoint(self, angle):
@@ -128,8 +128,7 @@ class Menu:
             
             self.__handleUserInteraction()
 
-            #Draw background
-            self.screen.blit(self.background, (0, 0))        
+            pygame.draw.rect(self.screen, BLACK, pygame.Rect(0, 0, self.SCREEN_W, self.SCREEN_H))
             
             #Create Menu Items depending on current selection.
             shift0 = 0
