@@ -26,4 +26,5 @@ Tom
 - Tidy up score/time fonts and background
 - Game end button                           +
 - Fullscreen and resolution-independence    +
+- Aircraft-aircraft collision handling      +
 - Obstacles

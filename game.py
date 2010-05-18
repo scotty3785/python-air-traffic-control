@@ -64,7 +64,7 @@ class Game:
 
         #Generations functions
         self.__generateDestinations()
-        self.__generateObstacles()
+        #self.__generateObstacles() TODO - put this back in when working
         self.__generateAircraftSpawnEvents()
 
         self.app = gui.App()
@@ -113,6 +113,7 @@ class Game:
 
             #Move/redraw/collide aircraft
             self.__update()
+            self.__handleAircraftObstacleCollisions()
 
             #Draw black rect over RHS of screen, to occult bits of plane/obstacle that may be there
             pygame.draw.rect(self.screen, (0, 0, 0), pygame.Rect((Game.FSPANE_LEFT, 0), (Game.SCREEN_W - 1 - Game.FSPANE_LEFT, Game.FSPANE_TOP - 4)))
@@ -164,8 +165,6 @@ class Game:
                 a.draw(self.screen)
 
             #Check collisions
-            for o in self.obstacles:
-            	self.__handleObstacleCollision(a, o)
             for ac_t in self.aircraft:
                 if(ac_t != a):
                 	self.__handleAircraftCollision(ac_t, a)
@@ -260,9 +259,11 @@ class Game:
     def __callback_User_End(self):
         self.gameEndCode = Config.GAME_CODE_USER_END
 
-    def __handleObstacleCollision(self, ac, obs):
-        if(obs.isPointInside(ac.getLocation()) == True):
-            self.score += Config.SCORE_OBS_COLLIDE
+    def __handleAircraftObstacleCollisions(self):
+        for o in self.obstacles:
+            newCollides = o.collideAircraft(self.aircraft)
+            self.score += (newCollides * Config.SCORE_OBS_COLLIDE)
+            
 
     def __handleAircraftCollision(self, ac1, ac2):
         if( Utility.locDistSq(ac1.getLocation(), ac2.getLocation()) < (Config.AC_COLLISION_RADIUS ** 2) ):
@@ -301,7 +302,12 @@ class Game:
             self.destinations.append(dest)
 
     def __generateObstacles(self):
-        pass                    #TODO
+        for x in range(0, Config.NUMBEROFOBSTACLES):
+            randx = random.randint( 40, Game.AERIALPANE_W - 40 )
+            randy = random.randint( 40, Game.AERIALPANE_H - 40 )
+            randtype = random.randint(0, 2)
+            obstacle = Obstacle(Obstacle.TYPE_WEATHER, (randx, randy))
+            self.obstacles.append(obstacle)
 
     def __generateRandomSpawnPoint(self):
         side = random.randint(1, 4)
