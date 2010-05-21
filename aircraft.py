@@ -67,6 +67,9 @@ class Aircraft:
     #Return current heading
     def getHeading(self):
         return self.heading
+        
+    def getIdent(self):
+        return self.ident
 
 	#Set speed in pixels per frame
 	def setSpeed(self, newspeed):
@@ -106,8 +109,7 @@ class Aircraft:
 
 		# Draw the ident string next to the aircraft?
         x = self.location[0] + 20
-        y = self.location[1] 
-        #list = string.split(self.ident,"\n")
+        y = self.location[1]
         list = [self.ident, "FL" + str(self.altitude/100), str(self.speed * Config.AC_SPEED_SCALEFACTOR) + "kts"]
         for line in list:
 			id = self.font.render(line, False, self.fs_font_color)

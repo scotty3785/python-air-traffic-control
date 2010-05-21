@@ -2,12 +2,13 @@
 
 import pygame;
 import os;
+import random;
+from config import *;
 
 class Obstacle:
 
     TYPE_WEATHER = 0
-    TYPE_NOFLY = 1
-    TYPE_MOUNTAIN = 2
+    TYPE_MOUNTAIN = 1
 
     def __init__(self, obs_type, location):
         self.location = location
@@ -15,13 +16,10 @@ class Obstacle:
         self.colliding = []
         if(self.type == Obstacle.TYPE_WEATHER):
             self.image = pygame.image.load(os.path.join('data', 'obs_weather.png'))
-        elif(self.type == Obstacle.TYPE_NOFLY):
-            self.image = pygame.image.load(os.path.join('data', 'obs_nofly.png'))
         elif(self.type == Obstacle.TYPE_MOUNTAIN):
             self.image = pygame.image.load(os.path.join('data', 'obs_mountain.png'))
             
-        self.image_mask = pygame.mask.from_surface(self.image)
-        self.rect = self.image.get_rect()
+        self.mask = pygame.mask.from_surface(self.image)
 
     def getType(self):
         return self.type
@@ -33,7 +31,10 @@ class Obstacle:
         newCollides = 0
         for a in aircraft:
             currCollide = self.__isColliding(a)
-            prevCollide = (a in self.colliding)
+            if(a in self.colliding):
+                prevCollide = True
+            else:
+                prevCollide = False
             if(currCollide == True and prevCollide == False):
                 self.colliding.append(a)
                 newCollides += 1
@@ -43,11 +44,23 @@ class Obstacle:
             
     def __isColliding(self, ac):
         collide = False
+        rect = self.image.get_rect()
+        rect.topleft = self.location
         #Don't bother with the masky stuff if the ac is outside rect
-        if(self.rect.collidepoint(ac.getLocation()) == True):
-            #AC is within rect
-            acLocOffsetX = ac.getLocation()[0] - self.rect.left
-            acLocOffsetY = ac.getLocation()[1] - self.rect.top
+        if(rect.collidepoint(ac.getLocation()) == True):
+            acLocOffsetX = ac.getLocation()[0] - rect.left
+            acLocOffsetY = ac.getLocation()[1] - rect.top
             if(self.mask.get_at((acLocOffsetX, acLocOffsetY)) != 0):
                 collide = True
         return collide
+        
+    @staticmethod
+    def generateGameObstacles(screen_w, screen_h):
+        ret = []
+        for x in range(0, Config.NUMBEROFOBSTACLES):
+            randx = random.randint( 40, screen_w - 100 )
+            randy = random.randint( 40, screen_h - 80 )
+            randtype = random.randint(0, 1)
+            obstacle = Obstacle(randtype, (randx, randy))
+            ret.append(obstacle)
+        return ret

@@ -5,9 +5,9 @@ import pygame;
 class Config:
 
     GAMETIME = 180000;                  #Game length in milliseconds
-    NUMBEROFAIRCRAFT = 80;              #Number of aircraft spawning during the game
+    NUMBEROFAIRCRAFT = 25;              #Number of aircraft spawning during the game
     NUMBEROFDESTINATIONS = 6;           #Number of destinations spawning during the game
-    NUMBEROFOBSTACLES = 6;
+    NUMBEROFOBSTACLES = 5;
     FRAMERATE = 40                      #Framerate of the main game loop
 
     MAX_WAYPOINTS = 6;                  #Max user-selectable waypoints per a/c

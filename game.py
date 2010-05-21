@@ -64,7 +64,7 @@ class Game:
 
         #Generations functions
         self.__generateDestinations()
-        #self.__generateObstacles() TODO - put this back in when working
+        self.__generateObstacles()
         self.__generateAircraftSpawnEvents()
 
         self.app = gui.App()
@@ -95,8 +95,10 @@ class Game:
             
             #Draw background
             pygame.draw.rect(self.screen, (0, 0, 0), self.screen.get_rect())
-            pygame.draw.line(self.screen, (255, 255, 255), (Game.AERIALPANE_W + 1, 0), (Game.AERIALPANE_W + 1, Game.SCREEN_H), 3)
-            pygame.draw.line(self.screen, (255, 255, 255), (Game.FSPANE_LEFT, Game.FSPANE_TOP - 2), (Game.SCREEN_W, Game.FSPANE_TOP - 2), 3)
+
+            #Draw obstacles
+            for x in self.obstacles:
+                x.draw(self.screen)
 
             #Draw radar circles
             pygame.draw.circle(self.screen, Game.RADAR_CIRC_COLOR, (Game.AERIALPANE_W / 2, Game.AERIALPANE_H / 2), Game.RADAR_RADIUS * 1/3, 1)
@@ -107,10 +109,6 @@ class Game:
             for x in self.destinations:
                 x.draw(self.screen)
 
-            #Draw obstacles
-            for x in self.obstacles:
-                x.draw(self.screen)
-
             #Move/redraw/collide aircraft
             self.__update()
             self.__handleAircraftObstacleCollisions()
@@ -118,6 +116,8 @@ class Game:
             #Draw black rect over RHS of screen, to occult bits of plane/obstacle that may be there
             pygame.draw.rect(self.screen, (0, 0, 0), pygame.Rect((Game.FSPANE_LEFT, 0), (Game.SCREEN_W - 1 - Game.FSPANE_LEFT, Game.FSPANE_TOP - 4)))
             pygame.draw.rect(self.screen, (0, 0, 0), pygame.Rect((Game.FSPANE_LEFT, Game.FSPANE_TOP), (Game.SCREEN_W - 1 - Game.FSPANE_LEFT, Game.SCREEN_H - Game.FSPANE_TOP)))
+            pygame.draw.line(self.screen, (255, 255, 255), (Game.AERIALPANE_W + 1, 0), (Game.AERIALPANE_W + 1, Game.SCREEN_H), 3)
+            pygame.draw.line(self.screen, (255, 255, 255), (Game.FSPANE_LEFT, Game.FSPANE_TOP - 2), (Game.SCREEN_W, Game.FSPANE_TOP - 2), 3)
 
             #Draw flightstrips
             for n in range(0, len(self.aircraft)):
@@ -167,7 +167,7 @@ class Game:
             #Check collisions
             for ac_t in self.aircraft:
                 if(ac_t != a):
-                	self.__handleAircraftCollision(ac_t, a)
+                    self.__handleAircraftCollision(ac_t, a)
 
         for a in ac_removal:
             if(self.ac_selected == a):
@@ -183,7 +183,6 @@ class Game:
                 self.aircraft.append(ac)
                 self.aircraftspawns.remove(sp)
                 self.aircraftspawntimes.remove(self.aircraftspawntimes[0])
-
 
     def __handleUserInteraction(self):
 
@@ -255,7 +254,7 @@ class Game:
 
                 if(event.key == pygame.K_ESCAPE):
                     self.gameEndCode = Config.CODE_KILL
-        
+
     def __callback_User_End(self):
         self.gameEndCode = Config.GAME_CODE_USER_END
 
@@ -263,7 +262,6 @@ class Game:
         for o in self.obstacles:
             newCollides = o.collideAircraft(self.aircraft)
             self.score += (newCollides * Config.SCORE_OBS_COLLIDE)
-            
 
     def __handleAircraftCollision(self, ac1, ac2):
         if( Utility.locDistSq(ac1.getLocation(), ac2.getLocation()) < (Config.AC_COLLISION_RADIUS ** 2) ):
@@ -285,41 +283,14 @@ class Game:
         return foundac
 
     def __generateAircraftSpawnEvents(self):
-        for x in range(0, Config.NUMBEROFAIRCRAFT):
-            randtime = random.randint(1, Config.GAMETIME)
-            randspawn = self.__generateRandomSpawnPoint();
-            randdest = random.choice(self.destinations)
-            spawnevent = AircraftSpawnEvent(randspawn, randdest)
-            self.aircraftspawntimes.append(randtime)
-            self.aircraftspawns.append(spawnevent)
+        (self.aircraftspawntimes, self.aircraftspawns) = AircraftSpawnEvent.generateGameSpawnEvents(Game.AERIALPANE_W, Game.AERIALPANE_H, self.destinations)
         self.aircraftspawntimes.sort()
 
     def __generateDestinations(self):
-        for x in range(0, Config.NUMBEROFDESTINATIONS):
-            randx = random.randint( 20, Game.AERIALPANE_W - 20 )
-            randy = random.randint( 20, Game.AERIALPANE_H - 20 )
-            dest = Destination((randx, randy), "D" + str(x))
-            self.destinations.append(dest)
+        self.destinations = Destination.generateGameDestinations(Game.AERIALPANE_W, Game.AERIALPANE_H)
 
     def __generateObstacles(self):
-        for x in range(0, Config.NUMBEROFOBSTACLES):
-            randx = random.randint( 40, Game.AERIALPANE_W - 40 )
-            randy = random.randint( 40, Game.AERIALPANE_H - 40 )
-            randtype = random.randint(0, 2)
-            obstacle = Obstacle(Obstacle.TYPE_WEATHER, (randx, randy))
-            self.obstacles.append(obstacle)
-
-    def __generateRandomSpawnPoint(self):
-        side = random.randint(1, 4)
-        if side == 1:
-            loc = (random.randint(0, Game.AERIALPANE_W), 0)
-        elif side == 2:
-            loc = (Game.AERIALPANE_W, random.randint(0, Game.AERIALPANE_H))
-        elif side == 3:
-            loc = (random.randint(0, Game.AERIALPANE_W), Game.AERIALPANE_H)
-        elif side == 4:
-            loc = (0, random.randint(0, Game.AERIALPANE_H))
-        return loc
+        self.obstacles = Obstacle.generateGameObstacles(Game.AERIALPANE_W, Game.AERIALPANE_H)
 
     def __displayPostGameDialog(self):
         #Do post-loop actions (game over dialogs)

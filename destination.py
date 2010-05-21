@@ -2,6 +2,7 @@
 #   Author: Tom Woolfrey
 
 import pygame;
+import random;
 from config import *;
 from waypoint import *;
 
@@ -31,3 +32,13 @@ class Destination(Waypoint):
 	# Does not fix the problem though... still get the same error
 	def clickedOn(self, clickpos):
 		return False
+		
+    @staticmethod
+    def generateGameDestinations(screen_w, screen_h):
+        ret = []
+        for x in range(0, Config.NUMBEROFDESTINATIONS):
+            randx = random.randint( 20, screen_w - 20 )
+            randy = random.randint( 20, screen_h - 20 )
+            dest = Destination((randx, randy), "D" + str(x))
+            ret.append(dest)
+        return ret
