@@ -66,7 +66,7 @@ class HighScore:
     def __handleUserInteraction(self):
         for event in pygame.event.get():
             if(event.type == pygame.MOUSEBUTTONDOWN):
-                print "Mouse Click: " + str(event.pos)
+                pass
                 self.highEnd = Config.GAME_CODE_USER_END
             elif(event.type == pygame.QUIT):
                 self.highEnd = Config.GAME_CODE_USER_END
@@ -81,9 +81,7 @@ class HighScore:
         clock = pygame.time.Clock()
 
         if (score > 0):
-                print "Score Passed"
                 position = self.myScores.check(score)
-                print "Position:" + str(position)
                 if(position != None):
                     app = gui.Desktop()
                     app.connect(gui.QUIT,app.quit,None)
@@ -116,8 +114,6 @@ class HighScore:
                     t.td( b, style=td_style )
                     main.add(t, 20, 100)
                     app.run(main)
-        else:
-             print "No Score Passed"
   
         #Draw background
         pygame.draw.rect(self.screen, (255, 255, 255), pygame.Rect(0, 0, self.SCREEN_W, self.SCREEN_H))  

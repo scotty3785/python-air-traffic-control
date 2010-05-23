@@ -14,16 +14,10 @@ class Aircraft:
     AC_IMAGE_NORMAL = pygame.image.load(os.path.join('data', 'aircraft.png'))
     AC_IMAGE_SELECTED = pygame.image.load(os.path.join('data', 'aircraft_sel.png'))
 
-    FS_FONTSIZE = 18
-    FS_FONT_COLOR_NORMAL = (255, 255, 255)
-    FS_FONT_COLOR_SELECTED = (50, 255, 50)
-    FS_BG_COLOR_NORMAL = (60, 60, 60)
-    FS_BG_COLOR_SELECTED = (60, 40, 255)
-
     EVENT_CLICK_AC = 0
     EVENT_CLICK_FS = 1
-    EVENT_CLICK_SPEED_UP = 2
-    EVENT_CLICK_SPEED_DOWN = 3
+    
+    FS_FONTSIZE = 18
 
 	#Constructor!
     def __init__(self, game, location, speed, destination, ident):
@@ -46,8 +40,7 @@ class Aircraft:
         #Image/font vars
         self.image = Aircraft.AC_IMAGE_NORMAL
         self.font = pygame.font.Font(None, Aircraft.FS_FONTSIZE)
-        self.fs_bg_color = Aircraft.FS_BG_COLOR_NORMAL
-        self.fs_font_color = Aircraft.FS_FONT_COLOR_NORMAL
+        self.fs_font_color = (255, 255, 255)
 
 	#Add a new waypoint in the specified index in the list
     def addWaypoint(self, waypoint, index=0):
@@ -68,10 +61,23 @@ class Aircraft:
 
     #Return current heading
     def getHeading(self):
-        return self.heading
+        ret = 0
+        if self.heading < 0:
+            ret = 360 + self.heading
+        else:
+            ret = self.heading
+        return ret
+        
+    def getHeadingStr(self):
+        hdg = self.getHeading()
+        hdg_str = format(hdg, ">03")
+        return hdg_str
         
     def getIdent(self):
         return self.ident
+
+    def getSpeed(self):
+        return self.speed
 
 	#Set speed in pixels per frame
 	def setSpeed(self, newspeed):
@@ -82,12 +88,10 @@ class Aircraft:
         self.selected = selected
         if(selected == True):
             self.image = Aircraft.AC_IMAGE_SELECTED
-            self.fs_font_color = Aircraft.FS_FONT_COLOR_SELECTED
-            self.fs_bg_color = Aircraft.FS_BG_COLOR_SELECTED
+            self.fs.style.background = (255, 0, 0)
         else:
             self.image = Aircraft.AC_IMAGE_NORMAL
-            self.fs_font_color = Aircraft.FS_FONT_COLOR_NORMAL
-            self.fs_bg_color = Aircraft.FS_BG_COLOR_NORMAL
+            self.fs.style.background = (0, 0, 255)
             
     def requestSelected(self):
         self.game.requestSelected(self)
@@ -133,24 +137,16 @@ class Aircraft:
 		#Keep moving towards waypoint
         self.heading = self.__calculateHeading(self.location, self.waypoints[0].getLocation())
         self.location = self.__calculateNewLocation(self.location, self.heading, self.speed)
+        self.fs.updateAllFields()
 
     def getClickDistanceSq(self, clickpos):
         return Utility.locDistSq(clickpos, self.location)
-
-    def clickedOnFlightstrip(self, clickpos):
-        return self.fs_rect.collidepoint(clickpos)
         
     def setFS(self, fs):
         self.fs = fs
         
     def getFS(self):
         return self.fs
-
-    def __clickedOnAircraft(self, clickpos):
-        if(Utility.locDistSq(clickpos, self.location) <= 100):
-            return True
-        else:
-            return False
 
 	#Calculate heading based on current position and waypoint
     def __calculateHeading(self, location, waypoint):
@@ -174,32 +170,8 @@ class Aircraft:
         else:
             return False
 
-    #Draw my flight strip at the given list index position
-    def drawFlightstrip(self, surface, rect):
-        self.fs_rect = rect
-
-        #Calc bounds
-        left = rect.left
-        top = rect.top
-        bottom = rect.bottom
-        right = rect.right
-
-        #Draw background
-        pygame.draw.rect(surface, self.fs_bg_color, rect, 0)
-
-        #Draw bottom line
-        pygame.draw.line(surface, (255, 255, 255), (rect.left, rect.bottom - 1), (rect.right, rect.bottom - 1), 1)
-
-        #Draw ident
-        srf_ident = self.font.render(self.ident, False, self.fs_font_color)
-        surface.blit(srf_ident, (rect.left + 5, rect.top + 4))
-
-        #Draw speed
-        srf_speed = self.font.render(str(self.speed * Config.AC_SPEED_SCALEFACTOR) + "kts", False, self.fs_font_color)
-        surface.blit(srf_speed, (rect.left + 5, rect.top + 28))
-
-    def click(self, clickpos, index):
-        if(self.__clickedOnFlightstrip(clickpos, index) == True):
-            return EVENT_CLICK_FS
-        elif(self.__clickedOnAircraft(clickpos, index) == True):
-            return EVENT_CLICK_AC
+    def click(self, clickpos):
+        if(Utility.locDistSq(clickpos, self.location) <= 100):
+            return True
+        else:
+            return False

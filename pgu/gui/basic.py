@@ -101,7 +101,7 @@ class Label(widget.Widget):
     
     def paint(self,s):
         s.blit(self.font.render(self.value, 1, self.style.color),(0,0))
-
+        
 class Image(widget.Widget):
     """An image.
     

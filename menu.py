@@ -62,7 +62,6 @@ class Menu:
     def __handleUserInteraction(self):
         for event in pygame.event.get():
             if(event.type == pygame.MOUSEBUTTONDOWN):
-                print "Mouse Click: " + str(event.pos)
                 ret = self.__mouseMenuSelection(event.pos)
                 if (self.selection == 2):
                     self.menuEnd = Config.CODE_KILL
@@ -70,7 +69,6 @@ class Menu:
                     self.menuEnd = Config.MENU_CODE_HIGH_SCORE
                     self.menuEnd = Config.MENU_CODE_HIGH_SCORE
                 elif (self.selection == 0):
-                    print "I clicked on start"
                     self.menuEnd = Config.MENU_CODE_START
                 break
             elif(event.type == pygame.MOUSEMOTION):
@@ -99,11 +97,6 @@ class Menu:
                         self.menuEnd = Config.MENU_CODE_START
                     break
  
-    def __calcRadarEndPoint(self, angle):
-        dx = Config.RADAR_RADIUS * math.sin(math.radians(angle))
-        dy = Config.RADAR_RADIUS * math.cos(math.radians(angle))
-        return ( (Menu.AERIALPANE_W / 2) + dx, (Menu.AERIALPANE_H / 2) - dy)
-
     def start(self):
         Texty = texty(None,40)
         Bigtex = texty(None,60) #large text

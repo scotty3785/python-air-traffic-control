@@ -285,10 +285,6 @@ class Game:
         for i in range(0, len(self.aircraft)):
             ac = self.aircraft[i]
             distsq = ac.getClickDistanceSq(clickpos)
-            #if( ac.clickedOnFlightstrip(clickpos) ):
-            #    foundac = ac
-            #    break;
-            #el
             if( distsq < mindistsq ):
                 foundac = ac
                 mindistsq = distsq
