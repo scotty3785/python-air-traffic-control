@@ -26,10 +26,12 @@ class Aircraft:
     EVENT_CLICK_SPEED_DOWN = 3
 
 	#Constructor!
-    def __init__(self, location, speed, destination, ident):
+    def __init__(self, game, location, speed, destination, ident):
+
+        self.game = game
 
         #Game state vars
-        self.location = location;
+        self.location = location
         self.speed = speed
         self.altitude = 24000 # hardwired for now; measured in ft
         self.waypoints = []
@@ -86,6 +88,9 @@ class Aircraft:
             self.image = Aircraft.AC_IMAGE_NORMAL
             self.fs_font_color = Aircraft.FS_FONT_COLOR_NORMAL
             self.fs_bg_color = Aircraft.FS_BG_COLOR_NORMAL
+            
+    def requestSelected(self):
+        self.game.requestSelected(self)
 
 	#Draw myself on the screen at my current position and heading
     def draw(self, surface):
@@ -134,6 +139,12 @@ class Aircraft:
 
     def clickedOnFlightstrip(self, clickpos):
         return self.fs_rect.collidepoint(clickpos)
+        
+    def setFS(self, fs):
+        self.fs = fs
+        
+    def getFS(self):
+        return self.fs
 
     def __clickedOnAircraft(self, clickpos):
         if(Utility.locDistSq(clickpos, self.location) <= 100):

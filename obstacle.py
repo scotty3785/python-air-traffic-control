@@ -48,8 +48,8 @@ class Obstacle:
         rect.topleft = self.location
         #Don't bother with the masky stuff if the ac is outside rect
         if(rect.collidepoint(ac.getLocation()) == True):
-            acLocOffsetX = ac.getLocation()[0] - rect.left
-            acLocOffsetY = ac.getLocation()[1] - rect.top
+            acLocOffsetX = int(ac.getLocation()[0] - rect.left)
+            acLocOffsetY = int(ac.getLocation()[1] - rect.top)
             if(self.mask.get_at((acLocOffsetX, acLocOffsetY)) != 0):
                 collide = True
         return collide

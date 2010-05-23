@@ -10,6 +10,7 @@ from obstacle import *;
 from aircraftspawnevent import *;
 from utility import *;
 from pgu import gui;
+from flightstrippane import *;
 
 class Game:
 
@@ -37,6 +38,7 @@ class Game:
         Game.AERIALPANE_W = Game.SCREEN_H
         Game.AERIALPANE_H = Game.SCREEN_H
         Game.FSPANE_LEFT = Game.AERIALPANE_W + 3
+        Game.FSPANE_H = Game.SCREEN_H - Game.FSPANE_TOP
         Game.FS_W = Game.SCREEN_W - Game.FSPANE_LEFT
         Game.FS_H = 60
         Game.RADAR_RADIUS = (Game.AERIALPANE_H - 50) / 2
@@ -72,7 +74,11 @@ class Game:
         
         self.btn_game_end = gui.Button(value="End Game", width=Game.FS_W-3, height=60)
         self.btn_game_end.connect(gui.CLICK, self.__callback_User_End)
+        
+        self.cnt_fspane = FlightStripPane(left=Game.FSPANE_LEFT, top=Game.FSPANE_TOP, width=Game.FS_W, align=-1, valign=-1)
+        
         self.cnt_main.add(self.btn_game_end, Game.FSPANE_LEFT, Game.FSPANE_TOP - 65)
+        self.cnt_main.add(self.cnt_fspane, Game.FSPANE_LEFT, Game.FSPANE_TOP)
 
         self.app.init(self.cnt_main, self.screen)
 
@@ -85,13 +91,6 @@ class Game:
 
             #Handle any UI stuff
             self.__handleUserInteraction()
-
-			# Deselect all aircraft first, the active one
-            for a in self.aircraft:
-                a.setSelected(False)
-           	# Then reselect the active aircraft 
-            if(self.ac_selected != None):
-                self.ac_selected.setSelected(True)
             
             #Draw background
             pygame.draw.rect(self.screen, (0, 0, 0), self.screen.get_rect())
@@ -120,8 +119,8 @@ class Game:
             pygame.draw.line(self.screen, (255, 255, 255), (Game.FSPANE_LEFT, Game.FSPANE_TOP - 2), (Game.SCREEN_W, Game.FSPANE_TOP - 2), 3)
 
             #Draw flightstrips
-            for n in range(0, len(self.aircraft)):
-                self.aircraft[n].drawFlightstrip(self.screen, pygame.Rect((Game.FSPANE_LEFT, Game.FSPANE_TOP + (n * Game.FS_H)), (Game.FS_W, Game.FS_H)))
+            #for n in range(0, len(self.aircraft)):
+            #    self.aircraft[n].drawFlightstrip(self.screen, pygame.Rect((Game.FSPANE_LEFT, Game.FSPANE_TOP + (n * Game.FS_H)), (Game.FS_W, Game.FS_H)))
 
             #Draw score/time indicators
             sf_score = self.font.render("Score: " + str(self.score), True, Game.COLOR_SCORETIME)
@@ -144,6 +143,16 @@ class Game:
         self.__displayPostGameDialog()
 
         return (self.gameEndCode, self.score)
+        
+    #Request a new selected aircraft
+    def requestSelected(self, ac):
+        self.ac_selected = ac
+        # Deselect all aircraft first
+        for a in self.aircraft:
+            a.setSelected(False)
+        # Then reselect the active aircraft 
+        if(self.ac_selected != None):
+            self.ac_selected.setSelected(True)
             
     def __update(self):
 
@@ -171,16 +180,18 @@ class Game:
 
         for a in ac_removal:
             if(self.ac_selected == a):
-                a.setSelected(False)
-                self.ac_selected = None
+                self.requestSelected(None)
             self.aircraft.remove(a)
+            self.cnt_fspane.remove(a.getFS())
 
         #4: Spawn new aircraft due for spawning
         if(len(self.aircraftspawntimes) != 0):
             if self.ms_elapsed >= self.aircraftspawntimes[0]:
                 sp = self.aircraftspawns[0]
-                ac = Aircraft(sp.getSpawnPoint(), Config.AC_SPEED_DEFAULT, sp.getDestination(), "BA" + str(random.randint(1, 100)))
-                self.aircraft.append(ac)
+                if(len(self.aircraft) < math.floor(Game.FSPANE_H / 60)):
+                    ac = Aircraft(self, sp.getSpawnPoint(), Config.AC_SPEED_DEFAULT, sp.getDestination(), "BA" + str(random.randint(1, 100)))
+                    self.aircraft.append(ac)
+                    self.cnt_fspane.addNewFlightStrip(ac)
                 self.aircraftspawns.remove(sp)
                 self.aircraftspawntimes.remove(self.aircraftspawntimes[0])
 
@@ -201,7 +212,7 @@ class Game:
                 clickedac = self.__getACClickedOn(event.pos)
                 if(clickedac != None):
                     #Clicked an aircraft
-                    self.ac_selected = clickedac
+                    self.requestSelected(clickedac)
                 else:
                     if(self.ac_selected != None):
                         #Not clicked aircraft, check waypoints of currently selected ac
@@ -234,7 +245,7 @@ class Game:
                                     way_added = True
                                     break
                             if (way_added == False):
-                                self.ac_selected = None
+                                self.requestSelected(None)
 
             elif(event.type == pygame.MOUSEBUTTONUP and event.button == 1):
 
@@ -274,10 +285,11 @@ class Game:
         for i in range(0, len(self.aircraft)):
             ac = self.aircraft[i]
             distsq = ac.getClickDistanceSq(clickpos)
-            if( ac.clickedOnFlightstrip(clickpos) ):
-                foundac = ac
-                break;
-            elif( distsq < mindistsq ):
+            #if( ac.clickedOnFlightstrip(clickpos) ):
+            #    foundac = ac
+            #    break;
+            #el
+            if( distsq < mindistsq ):
                 foundac = ac
                 mindistsq = distsq
         return foundac
