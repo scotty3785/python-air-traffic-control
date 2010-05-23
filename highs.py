@@ -67,6 +67,7 @@ class HighScore:
         for event in pygame.event.get():
             if(event.type == pygame.MOUSEBUTTONDOWN):
                 print "Mouse Click: " + str(event.pos)
+                self.highEnd = Config.GAME_CODE_USER_END
             elif(event.type == pygame.QUIT):
                 self.highEnd = Config.GAME_CODE_USER_END
                 break
@@ -101,7 +102,7 @@ class HighScore:
                     main.add(t, 20, 100)
                     app.run(main)
                     if (userName.value != ""):
-                        position = self.myScores.submit(score,userName.value,None)
+                        position = self.myScores.submit(score,userName.value[0:15],None)
                 else:
                     app = gui.Desktop()
                     app.connect(gui.QUIT,app.quit,None)
