@@ -33,6 +33,7 @@ class Main:
     def run(self):
         state = STATE_MENU
         exit = 0
+        score = 0
         while (exit == 0):
              if (state == STATE_MENU):
                  menuEndCode = None
@@ -55,9 +56,9 @@ class Main:
                  elif (gameEndCode == Config.GAME_CODE_AC_COLLIDE):
                      state = STATE_HIGH
              elif (state == STATE_HIGH):
-                 score = 0
                  highEndCode = self.high.start(score)
                  state = STATE_MENU
+                 score = 0
              elif (state == STATE_KILL):
                  exit = 1
 

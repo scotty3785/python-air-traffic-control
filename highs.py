@@ -8,7 +8,7 @@ import math
 import config
 from config import *
 import sys; sys.path.append("pgu")
-from pgu import high, gui
+from pgu import high, gui, html
 
 RED = (255,0,0)
 MAGENTA = (255, 56, 156)
@@ -68,54 +68,87 @@ class HighScore:
             if(event.type == pygame.MOUSEBUTTONDOWN):
                 print "Mouse Click: " + str(event.pos)
             elif(event.type == pygame.QUIT):
-                self.highEnd = GAME_CODE_MENU
+                self.highEnd = Config.GAME_CODE_USER_END
                 break
             elif(event.type == pygame.KEYDOWN):
                 if(event.key == pygame.K_ESCAPE):
-                    self.highEnd = Config.GAME_CODE_MENU
+                    self.highEnd = Config.GAME_CODE_USER_END
                     break
  
-    def start(self,score):               
+    def start(self,score):   
+        self.highEnd = 0            
         clock = pygame.time.Clock()
 
         if (score > 0):
-             print "Score Passed"
-             app = gui.Desktop()
-             app.connect(gui.QUIT,app.quit,None)
-             main = gui.Container(width=500, height=400) #, background=(220, 220, 220) )
-             main.add(gui.Label("New Highscore!!!", cls="h1"), 20, 20)
-             td_style = {'padding_right': 10}
-             t = gui.Table()
-             t.tr()
-             t.td( gui.Label('Type your name:') , style=td_style )
-             userName = gui.Input()
-             t.tr()
-             t.td( userName, style=td_style )
-             b = gui.Button("Done")
-             b.connect(gui.CLICK,app.quit,None)
-             t.td( b, style=td_style )
-             main.add(t, 20, 100)
-             app.run(main)
-             if (userName.value != ""):
-                   position = self.myScores.submit(score,userName.value,None)
+                print "Score Passed"
+                position = self.myScores.check(score)
+                print "Position:" + str(position)
+                if(position != None):
+                    app = gui.Desktop()
+                    app.connect(gui.QUIT,app.quit,None)
+                    main = gui.Container(width=500, height=400) #, background=(220, 220, 220) )
+                    main.add(gui.Label("You Placed on the High Score Table!!", cls="h1"), 20, 20)
+                    td_style = {'padding_right': 10}
+                    t = gui.Table()
+                    t.tr()
+                    t.td( gui.Label('Type your name:') , style=td_style )
+                    userName = gui.Input()
+                    t.tr()
+                    t.td( userName, style=td_style )
+                    b = gui.Button("Done")
+                    b.connect(gui.CLICK,app.quit,None)
+                    t.td( b, style=td_style )
+                    main.add(t, 20, 100)
+                    app.run(main)
+                    if (userName.value != ""):
+                        position = self.myScores.submit(score,userName.value,None)
+                else:
+                    app = gui.Desktop()
+                    app.connect(gui.QUIT,app.quit,None)
+                    main = gui.Container(width=500, height=400) #, background=(220, 220, 220) )
+                    main.add(gui.Label("Sorry you didn't get a high score", cls="h1"), 20, 20)
+                    td_style = {'padding_right': 10}
+                    t = gui.Table()
+                    t.tr()
+                    b = gui.Button("Done")
+                    b.connect(gui.CLICK,app.quit,None)
+                    t.td( b, style=td_style )
+                    main.add(t, 20, 100)
+                    app.run(main)
         else:
              print "No Score Passed"
   
         #Draw background
-        pygame.draw.rect(self.screen, (0, 0, 0), pygame.Rect(0, 0, self.SCREEN_W, self.SCREEN_H))  
+        pygame.draw.rect(self.screen, (255, 255, 255), pygame.Rect(0, 0, self.SCREEN_W, self.SCREEN_H))  
             
         #Draw Highscore Table
         self.scoretable = ""
-        for e in self.myScores:   
-            self.scoretable += "%s       %s\n" % (e.name,e.score)
-            drawtext(self.screen,self.scoretable,self.font)
+        
+        data = "<table width=100% align='center' style='border:1px; border-color: #000088; background: #ccccff; margin: 20px; padding: 20px;'>"
+        data += "<tr><td width=100%><b>Player</b></th><td width=100%><b>Score</b></th></tr>"
+        
+        for e in self.myScores:
+            data += "<tr>"
+            data += "<td>"
+            data += e.name
+            data += "</td>"
+            data += "<td>"
+            data += str(e.score)
+            data += "</td>"
+            data += "</tr>"
+            #self.scoretable += "%s       %s\n" % (e.name,e.score)
+            #drawtext(self.screen,self.scoretable,self.font)
             
             #Draw Screen
-            pygame.display.flip()
+            #pygame.display.flip()
+        data += "</table>"
+        
+        pygame.display.flip()
         self.hiScore.save()
-        while (self.highEnd):
+        while (self.highEnd == 0):
             self.__handleUserInteraction()
-            drawtext(self.screen,self.scoretable,self.font)
+            html.write(self.screen,self.font,pygame.Rect(300,200,500,500),data)
+            #drawtext(self.screen,self.scoretable,self.font)
             #Draw Screen
             pygame.display.flip()
         return self.highEnd
@@ -126,7 +159,7 @@ if __name__ == '__main__':
     screen = display.set_mode((1024, 768))
 
     game_scores = HighScore(screen)
-    game_scores.start(200)
+    game_scores.start(300)
 
 
 
