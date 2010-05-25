@@ -1,8 +1,9 @@
+#   File: high.py
+#   Description: An instance of the highscores screen
+
 from high import *
 import pygame
 from pygame import *
-import os
-import pygame
 import os
 import math
 import config
@@ -10,43 +11,16 @@ from config import *
 import sys; sys.path.append("pgu")
 from pgu import high, gui, html
 
-RED = (255,0,0)
-MAGENTA = (255, 56, 156)
-ORANGE = (240, 240, 0)
-GREEN = (0,255,0)
-BLUE = (0,0,255)
-BLU = (83,190,255)
-WHITE = (255,255,255)
-BLACK = (0,0,0)
-GREY = (127, 127, 127)
-LGRAY = (200, 200, 200)
-DGRAY = (55, 55, 55)
+def PositionText(pos):
+    suffix = ["st","nd","rd","th"]
 
-#   File: high.py
-#   Description: An instance of the highscores screen
-
-def drawtext(screen,text,font):
-    x = 200
-    y = 200
-    tmp = string.split(text,"\n")
-    for line in tmp:
-        img = font.render(line,1,WHITE,BLACK)
-        rect = screen.blit(img,(x,y))
-        screen.fill(0, (rect.right, rect.top, 0, rect.height))
-        y = y + font.get_height()
-
-
-
-def texty(name,size):
-    Texty = pygame.font.Font(name, size)
-    return Texty
+    if (pos < 3):
+        return str(pos+1) + suffix[pos]
+    else:
+        return str(pos+1) + suffix[3]
+    
 
 class HighScore:
-
-    AERIALPANE_W = 795
-    AERIALPANE_H = 768
-    STRIPPANE_TOP = 152
-    STRIPPANE_H = 44
 
     def __init__(self, screen):
 		#Imagey type stuff
@@ -66,7 +40,10 @@ class HighScore:
     def __handleUserInteraction(self):
         for event in pygame.event.get():
             if(event.type == pygame.MOUSEBUTTONDOWN):
+<<<<<<< .mine
+=======
                 pass
+>>>>>>> .r72
                 self.highEnd = Config.GAME_CODE_USER_END
             elif(event.type == pygame.QUIT):
                 self.highEnd = Config.GAME_CODE_USER_END
@@ -86,7 +63,8 @@ class HighScore:
                     app = gui.Desktop()
                     app.connect(gui.QUIT,app.quit,None)
                     main = gui.Container(width=500, height=400) #, background=(220, 220, 220) )
-                    main.add(gui.Label("You Placed on the High Score Table!!", cls="h1"), 20, 20)
+                    positionText = "You are " + PositionText(position) + " on the High Score table!!"
+                    main.add(gui.Label(positionText, cls="h1"), 20, 20)
                     td_style = {'padding_right': 10}
                     t = gui.Table()
                     t.tr()
@@ -121,9 +99,11 @@ class HighScore:
         #Draw Highscore Table
         self.scoretable = ""
         
-        data = "<table width=100% align='center' style='border:1px; border-color: #000088; background: #ccccff; margin: 20px; padding: 20px;'>"
+        #data contains the html to be parsed on to the screen. This section sets up the table and the table headers
+        data = "<table border=1 width=100% align='center' style='border:1px; border-color: #000088; background: #ccccff; margin: 20px; padding: 20px;'>"
         data += "<tr><td width=100%><b>Player</b></th><td width=100%><b>Score</b></th></tr>"
         
+        #Iterate each item in the high score list and add each as a row to the table
         for e in self.myScores:
             data += "<tr>"
             data += "<td>"
@@ -133,20 +113,17 @@ class HighScore:
             data += str(e.score)
             data += "</td>"
             data += "</tr>"
-            #self.scoretable += "%s       %s\n" % (e.name,e.score)
-            #drawtext(self.screen,self.scoretable,self.font)
-            
-            #Draw Screen
-            #pygame.display.flip()
+
+        #Close the table
         data += "</table>"
         
-        pygame.display.flip()
+        #Now that we've finished readin from the highscores, save it back to the .txt file
         self.hiScore.save()
+
+        #Display the table until the user exits
         while (self.highEnd == 0):
             self.__handleUserInteraction()
-            html.write(self.screen,self.font,pygame.Rect(300,200,500,500),data)
-            #drawtext(self.screen,self.scoretable,self.font)
-            #Draw Screen
+            html.write(self.screen,self.font,pygame.Rect(300,200,600,500),data)
             pygame.display.flip()
         return self.highEnd
 
@@ -156,7 +133,7 @@ if __name__ == '__main__':
     screen = display.set_mode((1024, 768))
 
     game_scores = HighScore(screen)
-    game_scores.start(300)
+    game_scores.start(470)
 
 
 
