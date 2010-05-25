@@ -306,6 +306,16 @@ class Game:
         #Do post-loop actions (game over dialogs)
         if(self.gameEndCode != Config.GAME_CODE_USER_END and self.gameEndCode != Config.CODE_KILL):
             l = gui.Label("Game Over!")
+            b = gui.Button("OK")
+           
+            # Not nice... but one way of passing by reference!
+            # A list is a mutable object, while an int isn't -- that's why I'm using a list
+            # Wait for Python 3 to allow assigning non-global variable in outer scope (keyword: nonlocal)
+            bob = [False]
+            def okcb(b):
+                b[0] = True 
+
+            b.connect(gui.CLICK,okcb,bob)
             c = gui.Container()
 
             if(self.gameEndCode == Config.GAME_CODE_AC_COLLIDE):
@@ -313,9 +323,19 @@ class Game:
             elif(self.gameEndCode == Config.GAME_CODE_TIME_UP):
                 c.add(gui.Label("Time up!"), 0, 0)
 
+            c.add(b,0,30)
+
             d = gui.Dialog(l, c)
             d.open()
             self.app.update(self.screen)
             pygame.display.flip()
-            pygame.time.delay(3000)
+            #pygame.time.delay(3000)
+            clock = pygame.time.Clock()
+            while(not bob[0]):
+                timepassed = clock.tick(Config.FRAMERATE)
+                for e in pygame.event.get():
+                    self.app.event(e)
+                self.app.repaint()
+                self.app.update(self.screen)
+                pygame.display.flip()
 
