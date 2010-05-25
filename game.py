@@ -149,7 +149,8 @@ class Game:
         self.ac_selected = ac
         # Deselect all aircraft first
         for a in self.aircraft:
-            a.setSelected(False)
+            if(a != self.ac_selected):
+                a.setSelected(False)
         # Then reselect the active aircraft 
         if(self.ac_selected != None):
             self.ac_selected.setSelected(True)
@@ -244,7 +245,8 @@ class Game:
                                     self.way_clicked = newway
                                     way_added = True
                                     break
-                            if (way_added == False):
+                            #TW Fix this as it is sh*t
+                            if (way_added == False and 0 < event.pos[0] < Game.AERIALPANE_W ):
                                 self.requestSelected(None)
 
             elif(event.type == pygame.MOUSEBUTTONUP and event.button == 1):

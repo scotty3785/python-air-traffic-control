@@ -80,18 +80,18 @@ class Aircraft:
         return self.speed
 
 	#Set speed in pixels per frame
-	def setSpeed(self, newspeed):
-		self.speed = newspeed
+    def setSpeed(self, newspeed):
+        self.speed = newspeed
 
     #Set whether I am the selected aircraft or not
     def setSelected(self, selected):
         self.selected = selected
         if(selected == True):
             self.image = Aircraft.AC_IMAGE_SELECTED
-            self.fs.style.background = (255, 0, 0)
+            self.fs.select()
         else:
             self.image = Aircraft.AC_IMAGE_NORMAL
-            self.fs.style.background = (0, 0, 255)
+            self.fs.deselect()
             
     def requestSelected(self):
         self.game.requestSelected(self)
@@ -119,7 +119,7 @@ class Aircraft:
 		# Draw the ident string next to the aircraft?
         x = self.location[0] + 20
         y = self.location[1]
-        list = [self.ident, "FL" + str(self.altitude/100), str(self.speed * Config.AC_SPEED_SCALEFACTOR) + "kts"]
+        list = [self.ident, "FL" + str(self.altitude/100), str(self.speed) + "kts"]
         for line in list:
 			id = self.font.render(line, False, self.fs_font_color)
 			r = surface.blit(id, (x,y))
@@ -158,14 +158,14 @@ class Aircraft:
 
 	#Calculate new location based on current location, heading and speed
     def __calculateNewLocation(self, location, heading, speed):
-        x_diff = speed * math.sin(math.radians(heading))
-        y_diff = -speed * math.cos(math.radians(heading))
+        x_diff = (speed / Config.AC_SPEED_SCALEFACTOR) * math.sin(math.radians(heading))
+        y_diff = -(speed / Config.AC_SPEED_SCALEFACTOR) * math.cos(math.radians(heading))
         location = (location[0] + x_diff, location[1] + y_diff)
         return location
 
 	#Check whether I have reached the given waypoint
     def __reachedWaypoint(self, location, waypoint):
-        if Utility.locDistSq(location, waypoint) < (self.speed ** 2):
+        if Utility.locDistSq(location, waypoint) < ((self.speed/Config.AC_SPEED_SCALEFACTOR) ** 2):
             return True
         else:
             return False
