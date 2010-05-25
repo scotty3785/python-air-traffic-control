@@ -40,10 +40,7 @@ class HighScore:
     def __handleUserInteraction(self):
         for event in pygame.event.get():
             if(event.type == pygame.MOUSEBUTTONDOWN):
-<<<<<<< .mine
-=======
                 pass
->>>>>>> .r72
                 self.highEnd = Config.GAME_CODE_USER_END
             elif(event.type == pygame.QUIT):
                 self.highEnd = Config.GAME_CODE_USER_END
