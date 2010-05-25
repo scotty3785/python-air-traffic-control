@@ -11,6 +11,10 @@ from pygame.locals import *
 if not pygame.font: print 'Warning, fonts disabled'
 if not pygame.mixer: print 'Warning, sound disabled'
 
+# Add the parent directory of this file to the path 
+# Allows this file to be run from outside its parent directory
+sys.path.insert(0,os.path.dirname(os.path.abspath( __file__ )))
+
 class Button:
     def __init__(self,pos,text,cb=None):
         self.pos = pos
@@ -86,8 +90,8 @@ def main():
     #l = lambda x: sys.stdout.write(x)
     # Don't need to use lambda functions... simple function will do
     def startButtonCb(screen): g = Game(screen); g.start()
-    def scoresButtonCb(): print "Clicked on start game"
-    def quitButtonCb(): print "Clicked on start game"
+    def scoresButtonCb(): print "Clicked on scores"
+    def quitButtonCb(): print "Clicked on quit"
     startButton = Button((100,100),"Start game", startButtonCb) 
     scoresButton = Button((100,150),"Show high scores", scoresButtonCb)
     quitButton = Button((100,200),"Quit", quitButtonCb)

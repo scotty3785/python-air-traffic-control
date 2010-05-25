@@ -20,8 +20,10 @@ class AircraftSpawnEvent:
         
     @staticmethod
     def generateGameSpawnEvents(screen_w, screen_h, destinations):
-        ret = []
-        ret2 = []
+        ret = [1]
+        ret2 = [AircraftSpawnEvent(
+			AircraftSpawnEvent.__generateRandomSpawnPoint(screen_w,screen_h),
+			random.choice(destinations))]
         for x in range(0, Config.NUMBEROFAIRCRAFT):
             randtime = random.randint(1, Config.GAMETIME)
             randspawn = AircraftSpawnEvent.__generateRandomSpawnPoint(screen_w, screen_h)

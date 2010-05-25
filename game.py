@@ -239,7 +239,7 @@ class Game:
                             	currP = list[x]
                             	nextP = list[x+1]
                                 (intersect, dist) = Utility.getPointLineIntersect(currP, nextP, event.pos)
-                                if((intersect != None) and (dist <= 10)):
+                                if((intersect != None) and (dist <= 40)):
                                     newway = Waypoint(event.pos)
                                     self.ac_selected.addWaypoint(newway, x)
                                     self.way_clicked = newway
