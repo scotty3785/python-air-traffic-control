@@ -15,7 +15,8 @@ Steve
 - Tidy up event handling
 - Double-click waypoints +
 - Start menu
-
+- Highlight collisions
+- Flip flight strips (PGU: prevent widget parent container from responding to event)
 
 Tom
 ---

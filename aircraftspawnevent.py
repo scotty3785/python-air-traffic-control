@@ -17,22 +17,54 @@ class AircraftSpawnEvent:
 
     def __str__(self):
         return "<" + str(self.spawnpoint) + ", " + str(self.destination.getLocation()) + ">"
-        
+
+    @staticmethod
+    def valid_destinations(destinations,test1,test2):
+        d = filter(test1,destinations)
+        if (len(d) == 0):
+            print "No destinations after filtering, using complete list"
+            return destinations
+        else:
+            return d
+
+
     @staticmethod
     def generateGameSpawnEvents(screen_w, screen_h, destinations):
-        ret = [1]
-        ret2 = [AircraftSpawnEvent(
-			AircraftSpawnEvent.__generateRandomSpawnPoint(screen_w,screen_h),
-			random.choice(destinations))]
-        for x in range(0, Config.NUMBEROFAIRCRAFT):
-            randtime = random.randint(1, Config.GAMETIME)
-            randspawn = AircraftSpawnEvent.__generateRandomSpawnPoint(screen_w, screen_h)
-            randdest = random.choice(destinations)
-            spawnevent = AircraftSpawnEvent(randspawn, randdest)
-            ret.append(randtime)
-            ret2.append(spawnevent)
-        return (ret, ret2)
-    
+        randtime = [1]
+        randspawnevent = []
+        for x in range(1, Config.NUMBEROFAIRCRAFT):
+            randtime.append(random.randint(1, Config.GAMETIME))
+        for x in randtime:
+            randspawn, side = AircraftSpawnEvent.__generateRandomSpawnPoint(screen_w, screen_h)
+            if (side == 1):
+                def t1(d): 
+                    l = d.getLocation()
+                    return l[1] > screen_h/2
+                def t2(p1,p2):
+                    return 1
+            elif (side == 2):
+                def t1(d): 
+                    l = d.getLocation()
+                    return l[0] < screen_w/2
+                def t2(p1,p2):
+                    return 1
+            elif (side == 3):
+                def t1(d): 
+                    l = d.getLocation()
+                    return l[1] < screen_h/2
+                def t2(p1,p2):
+                    return 1
+            elif (side == 4):
+                def t1(d): 
+                    l = d.getLocation()
+                    return l[0] > screen_w/2
+                def t2(p1,p2):
+                    return 1
+            d = AircraftSpawnEvent.valid_destinations(destinations,t1,t2)
+            randdest = random.choice(d)
+            randspawnevent.append(AircraftSpawnEvent(randspawn, randdest))
+        return (randtime, randspawnevent)
+
     @staticmethod
     def __generateRandomSpawnPoint(screen_w, screen_h):
         side = random.randint(1, 4)
@@ -44,4 +76,4 @@ class AircraftSpawnEvent:
             loc = (random.randint(0, screen_w), screen_h)
         elif side == 4:
             loc = (0, random.randint(0, screen_h))
-        return loc
+        return (loc), side
