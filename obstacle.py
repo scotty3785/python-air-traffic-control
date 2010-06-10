@@ -20,17 +20,23 @@ class Obstacle:
             self.image = pygame.image.load(os.path.join('data', 'obs_mountain.png'))
             
         self.mask = pygame.mask.from_surface(self.image)
+        self.rect = self.image.get_rect()
+        self.rect.topleft = self.location
 
     def getType(self):
         return self.type
 
+    def setLocation(self, location):
+        self.location = location
+        self.rect.topleft = self.location
+        
     def draw(self, surface):
-        surface.blit(self.image, self.location)
+        surface.blit(self.image, self.rect)
         
     def collideAircraft(self, aircraft):
         newCollides = 0
         for a in aircraft:
-            currCollide = self.__isColliding(a)
+            currCollide = self.isColliding(a.getLocation())
             if(a in self.colliding):
                 prevCollide = True
             else:
@@ -42,25 +48,35 @@ class Obstacle:
                 self.colliding.remove(a)
         return newCollides
             
-    def __isColliding(self, ac):
+    def isColliding(self, point):
         collide = False
-        rect = self.image.get_rect()
-        rect.topleft = self.location
         #Don't bother with the masky stuff if the ac is outside rect
-        if(rect.collidepoint(ac.getLocation()) == True):
-            acLocOffsetX = int(ac.getLocation()[0] - rect.left)
-            acLocOffsetY = int(ac.getLocation()[1] - rect.top)
+        if(self.rect.collidepoint(point) == True):
+            acLocOffsetX = int(point[0] - self.rect.left)
+            acLocOffsetY = int(point[1] - self.rect.top)
             if(self.mask.get_at((acLocOffsetX, acLocOffsetY)) != 0):
                 collide = True
         return collide
         
     @staticmethod
-    def generateGameObstacles(screen_w, screen_h):
+    def generateGameObstacles(screen_w, screen_h, destinations):
         ret = []
-        for x in range(0, Config.NUMBEROFOBSTACLES):
-            randx = random.randint( 40, screen_w - 100 )
-            randy = random.randint( 40, screen_h - 80 )
+        x = 0
+        while x < Config.NUMBEROFOBSTACLES:
             randtype = random.randint(0, 1)
+            randx = random.randint( 40, screen_w - 100 )
+            randy = random.randint( 40, screen_h - 80 )            
             obstacle = Obstacle(randtype, (randx, randy))
+            collide = False
+            for d in destinations:
+                collide |= obstacle.isColliding(d.getLocation())            
+            while(collide == True):
+                randx = random.randint( 40, screen_w - 100 )
+                randy = random.randint( 40, screen_h - 80 )
+                obstacle.setLocation((randx, randy))
+                collide = False
+                for d in destinations:
+                    collide |= obstacle.isColliding(d.getLocation())
             ret.append(obstacle)
+            x += 1
         return ret

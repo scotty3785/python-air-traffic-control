@@ -17,7 +17,7 @@ class Waypoint:
         self.way_rect.center = self.location
 
     def draw(self, surface):
-        pygame.draw.rect(surface, (0, 0, 255), self.way_rect, 0)
+        pygame.draw.rect(surface, (255, 255, 0), self.way_rect, 0)
 
     def clickedOn(self, clickpos):
         return (self.way_rect.inflate(30,30).collidepoint(clickpos))

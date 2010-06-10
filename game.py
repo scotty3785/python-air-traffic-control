@@ -3,6 +3,7 @@
 
 import pygame;
 import random;
+import math;
 from config import *;
 from destination import *;
 from aircraft import *;
@@ -178,6 +179,7 @@ class Game:
             for ac_t in self.aircraft:
                 if(ac_t != a):
                     self.__handleAircraftCollision(ac_t, a)
+                    self.__highlightImpendingCollision(ac_t, a)
 
         for a in ac_removal:
             if(self.ac_selected == a):
@@ -204,7 +206,7 @@ class Game:
 
             if(event.type == pygame.MOUSEBUTTONDOWN and event.button == 1):
 			# MOUSEBUTTONDOWN event has members pos and button
-                if (self.last_click_time and pygame.time.get_ticks() -  self.last_click_time < 800):
+                if (self.last_click_time and pygame.time.get_ticks() -  self.last_click_time < 400):
                     dbl_click = True
                 else:
                     dbl_click = False
@@ -266,7 +268,7 @@ class Game:
             elif(event.type == pygame.KEYDOWN):
 
                 if(event.key == pygame.K_ESCAPE):
-                    self.gameEndCode = Config.CODE_KILL
+                    self.gameEndCode = Config.GAME_CODE_USER_END
 
     def __callback_User_End(self):
         self.gameEndCode = Config.GAME_CODE_USER_END
@@ -280,6 +282,35 @@ class Game:
         if( Utility.locDistSq(ac1.getLocation(), ac2.getLocation()) < (Config.AC_COLLISION_RADIUS ** 2) ):
             self.gameEndCode = Config.GAME_CODE_AC_COLLIDE
             self.score += Config.SCORE_AC_COLLIDE
+            # Highlight the collided aircraft
+            ac1.image = Aircraft.AC_IMAGE_SELECTED # later set to Aircraft.AC_IMAGE_COLLIDED
+            ac2.image = Aircraft.AC_IMAGE_SELECTED
+
+    def __highlightImpendingCollision(self, ac1, ac2):
+        if (Utility.locDistSq(ac1.getLocation(), ac2.getLocation()) < ((3 * Config.AC_COLLISION_RADIUS) ** 2) ):
+            ac1.image = Aircraft.AC_IMAGE_SELECTED # later set to Aircraft.AC_IMAGE_COLLIDING
+            ac2.image = Aircraft.AC_IMAGE_SELECTED
+            #ac1.addCollisionRisk(ac2)
+            #ac2.addCollisionRisk(ac1)
+        #elif (ac2 in ac1.collisionRisk):
+        #    ac1.image = Aircraft.AC_IMAGE_NORMAL
+        #    ac2.image = Aircraft.AC_IMAGE_NORMAL
+        #    ac1.collisionRisk.remove(ac2)
+        #elif (ac1 in ac1.collisionRisk): 
+        #    ac1.image = Aircraft.AC_IMAGE_NORMAL
+        #    ac2.image = Aircraft.AC_IMAGE_NORMAL
+        #    ac2.collisionRisk.remove(ac1)
+        # Temporary notes: 
+        # This will unhighlight colliding aircraft when they are checked against other aircraft
+        # with which they are not colliding...
+        #else:
+        #    ac1.image = Aircraft.AC_IMAGE_NORMAL
+        #    ac2.image = Aircraft.AC_IMAGE_NORMAL
+        # Need to store which aircraft it was in impending collision with and check against that
+        # aircraft before returning to normal image
+        # Each aircraft could keep a list of aircraft it's nearly in collision with, but what
+        # happens if that aircraft is arrives at its destination -- object is destroyed, so must
+        # check that reference is still valid
 
     def __getACClickedOn(self, clickpos):
         foundac = None
@@ -294,13 +325,35 @@ class Game:
 
     def __generateAircraftSpawnEvents(self):
         (self.aircraftspawntimes, self.aircraftspawns) = AircraftSpawnEvent.generateGameSpawnEvents(Game.AERIALPANE_W, Game.AERIALPANE_H, self.destinations)
-        self.aircraftspawntimes.sort()
+        while self.__areSpawnEventsTooClose(self.aircraftspawntimes, self.aircraftspawns) == True:
+            (self.aicraftspawntime, self.aircraftspawns) = AircraftSpawnEvent.generateGameSpawnEvents(Game.AERIALPANE_W, Game.AERIALPANE_H, self.destinations)
+
+    def __areSpawnEventsTooClose(self, times, spawns):
+        ret = False
+        if len(times) == len(spawns):
+            x = 0
+            y = 0
+            brk = False
+            while x < len(spawns) and (brk == False):
+                while y < len(spawns) and (brk == False):
+                    if(x != y):
+                        dist = Utility.locDistSq(spawns[x].getSpawnPoint(), spawns[y].getSpawnPoint())
+                        dt = math.fabs(times[x] - times[y])
+                        if ((dist < 25 ** 2) and (dt < 6000)):
+                            ret = True;
+                            brk = True;
+                    y += 1
+                x += 1
+        else:
+            ret = True
+        return ret
+                        
 
     def __generateDestinations(self):
         self.destinations = Destination.generateGameDestinations(Game.AERIALPANE_W, Game.AERIALPANE_H)
 
     def __generateObstacles(self):
-        self.obstacles = Obstacle.generateGameObstacles(Game.AERIALPANE_W, Game.AERIALPANE_H)
+        self.obstacles = Obstacle.generateGameObstacles(Game.AERIALPANE_W, Game.AERIALPANE_H, self.destinations)
 
     def __displayPostGameDialog(self):
         #Do post-loop actions (game over dialogs)

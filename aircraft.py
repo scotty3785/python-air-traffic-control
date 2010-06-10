@@ -29,6 +29,7 @@ class Aircraft:
         self.speed = speed
         self.altitude = 24000 # hardwired for now; measured in ft
         self.waypoints = []
+        self.collisionRisk = []
         self.waypoints.append(destination)
         self.ident = ident
         self.selected = False
@@ -47,7 +48,14 @@ class Aircraft:
         if(len(self.waypoints) < Config.MAX_WAYPOINTS + 1):
             self.waypoints.insert(index, waypoint)
             self.heading = self.__calculateHeading(self.location, self.waypoints[0].getLocation())
-	
+
+    #Add an aircraft almost in collision
+    def addCollisionRisk(self,ac):
+        print ac + "::" + self.collisionRisk
+        self.collisionRisk.append(ac)
+        self.image = Aircraft.AC_IMAGE_SELECTED # later set to Aircraft.AC_IMAGE_COLLIDING
+        ac.image = Aircraft.AC_IMAGE_SELECTED # later set to Aircraft.AC_IMAGE_COLLIDING
+
 	#Get the specified waypoint from the list
 	def getWaypoint(self, index):
 		return self.waypoints[index]
@@ -114,7 +122,7 @@ class Aircraft:
                 point_list.append(self.waypoints[x].getLocation())
                 self.waypoints[x].draw(surface)
             point_list.append(self.waypoints[-1].getLocation())
-            pygame.draw.aalines(surface, (0, 0, 255), False, point_list)
+            pygame.draw.aalines(surface, (255, 255, 0), False, point_list)
 
 		# Draw the ident string next to the aircraft?
         x = self.location[0] + 20

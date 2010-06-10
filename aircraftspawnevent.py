@@ -22,7 +22,6 @@ class AircraftSpawnEvent:
     def valid_destinations(destinations,test1,test2):
         d = filter(test1,destinations)
         if (len(d) == 0):
-            print "No destinations after filtering, using complete list"
             return destinations
         else:
             return d
@@ -34,6 +33,7 @@ class AircraftSpawnEvent:
         randspawnevent = []
         for x in range(1, Config.NUMBEROFAIRCRAFT):
             randtime.append(random.randint(1, Config.GAMETIME))
+        randtime.sort()
         for x in randtime:
             randspawn, side = AircraftSpawnEvent.__generateRandomSpawnPoint(screen_w, screen_h)
             if (side == 1):
