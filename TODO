@@ -17,6 +17,7 @@ Steve
 - Start menu +
 - Highlight collisions +
 - Flip flight strips (PGU: prevent widget parent container from responding to event) x
+- Demo mode AI (aka demented mode) +
 
 Tom
 ---
@@ -29,3 +30,5 @@ Tom
 - Fullscreen and resolution-independence    +
 - Aircraft-aircraft collision handling      +
 - Obstacles +
+- Demo mode framework +
+
