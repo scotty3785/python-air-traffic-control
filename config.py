@@ -28,8 +28,11 @@ class Config:
     GAME_CODE_TIME_UP = 2               #Code for the game time expiring
     GAME_CODE_AC_COLLIDE = 5            #Code for aircraft colliding
     MENU_CODE_START = 3                 #Menu code for clicking start
-    MENU_CODE_HIGH_SCORE = 4            #Menu code for clicking high score
+    MENU_CODE_DEMO = 4                  #Menu code for clicking demo
+    MENU_CODE_HIGH_SCORE = 5            #Menu code for clicking high score
 
     CODE_KILL = -10                     #Immediate game exit code
 
     GAME_FULLSCREEN = True              #Game full screen toggle (debug)
+    
+    GAME_DEMOMODE = False               #Are we in demo mode?

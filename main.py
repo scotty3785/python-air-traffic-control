@@ -8,8 +8,9 @@ import os;
 
 STATE_MENU = 1
 STATE_GAME = 2
-STATE_HIGH = 3
-STATE_KILL = 4
+STATE_DEMO = 3
+STATE_HIGH = 4
+STATE_KILL = 5
 
 class Main:
 
@@ -40,12 +41,14 @@ class Main:
                  menuEndCode = self.menu.start()
                  if (menuEndCode == Config.MENU_CODE_START):
                      state = STATE_GAME
+                 elif (menuEndCode == Config.MENU_CODE_DEMO):
+                     state = STATE_DEMO
                  elif (menuEndCode == Config.MENU_CODE_HIGH_SCORE):
                      state = STATE_HIGH
                  elif (menuEndCode == Config.CODE_KILL):
                      state = STATE_KILL
              elif (state == STATE_GAME):
-                 game = Game(self.screen)
+                 game = Game(self.screen, False)
                  (gameEndCode, score) = game.start()
                  if (gameEndCode == Config.GAME_CODE_TIME_UP):
                      state = STATE_HIGH
@@ -55,6 +58,10 @@ class Main:
                      state = STATE_MENU
                  elif (gameEndCode == Config.GAME_CODE_AC_COLLIDE):
                      state = STATE_HIGH
+             elif (state == STATE_DEMO):
+                game = Game(self.screen, True)
+                (gameEndCode, score) = game.start()
+                state = STATE_MENU
              elif (state == STATE_HIGH):
                  highEndCode = self.high.start(score)
                  state = STATE_MENU

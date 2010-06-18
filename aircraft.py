@@ -55,13 +55,6 @@ class Aircraft:
             self.waypoints.insert(index, waypoint)
             self.heading = self.__calculateHeading(self.location, self.waypoints[0].getLocation())
 
-    #Add an aircraft almost in collision
-    def addCollisionRisk(self,ac):
-        print ac + "::" + self.collisionRisk
-        self.collisionRisk.append(ac)
-        self.image = Aircraft.AC_IMAGE_SELECTED # later set to Aircraft.AC_IMAGE_COLLIDING
-        ac.image = Aircraft.AC_IMAGE_SELECTED # later set to Aircraft.AC_IMAGE_COLLIDING
-
 	#Get the specified waypoint from the list
 	def getWaypoint(self, index):
 		return self.waypoints[index]

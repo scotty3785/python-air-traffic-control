@@ -32,7 +32,7 @@ class Game:
 
     COLOR_SCORETIME = (20, 193, 236)    #Score/time counter colour
     
-    def __init__(self, screen):
+    def __init__(self, screen, demomode):
         #Screen vars
         Game.SCREEN_W = screen.get_size()[0]
         Game.SCREEN_H = screen.get_size()[1]
@@ -49,6 +49,7 @@ class Game:
         self.screen = screen
                
         #Aircraft/destination state vars
+        self.demomode = demomode
         self.gameEndCode = 0
         self.ms_elapsed = 0
         self.score = 0
@@ -127,12 +128,13 @@ class Game:
             sf_score = self.font.render("Score: " + str(self.score), True, Game.COLOR_SCORETIME)
             sf_time = self.font.render("Time: " + str( math.floor((Config.GAMETIME - self.ms_elapsed) / 1000) ), True, Game.COLOR_SCORETIME)
 
-            self.screen.blit(sf_score, (Game.FSPANE_LEFT + 30, 10))
-            self.screen.blit(sf_time, (Game.FSPANE_LEFT + 30, 40))
+            if self.demomode == False:
+                self.screen.blit(sf_score, (Game.FSPANE_LEFT + 30, 10))
+                self.screen.blit(sf_time, (Game.FSPANE_LEFT + 30, 40))
             
             #Recalc time and check for game end
             self.ms_elapsed = self.ms_elapsed + timepassed
-            if(self.ms_elapsed >= Config.GAMETIME):
+            if(self.ms_elapsed >= Config.GAMETIME and not self.demomode):
                 self.gameEndCode = Config.GAME_CODE_TIME_UP
                 
             #Flip the framebuffers
@@ -203,73 +205,78 @@ class Game:
         for event in pygame.event.get():
 
             self.app.event(event)
-
-            if(event.type == pygame.MOUSEBUTTONDOWN and event.button == 1):
-			# MOUSEBUTTONDOWN event has members pos and button
-                if (self.last_click_time and pygame.time.get_ticks() -  self.last_click_time < 400):
-                    dbl_click = True
-                else:
-                    dbl_click = False
-                self.last_click_time = pygame.time.get_ticks()
-
-                clickedac = self.__getACClickedOn(event.pos)
-                if(clickedac != None):
-                    #Clicked an aircraft
-                    self.requestSelected(clickedac)
-                else:
-                    if(self.ac_selected != None):
-                        #Not clicked aircraft, check waypoints of currently selected ac
-                        wclick = False
-                        for x in range(0, len(self.ac_selected.getWaypoints()) - 1):
-                            w = self.ac_selected.getWaypoints()[x]
-                            if(w.clickedOn(event.pos) == True):
-                                if (dbl_click):
-                                    # Use del list[index] instead?
-                                    self.ac_selected.waypoints.remove(w)     
-                                    wclick = True
-                                    break
-                                else:
-                                    self.way_clicked = w
-                                    wclick = True
-                        if wclick == False:
-                            #Not clicked waypoint, check lines
-                            way_added = False
-                            # Still not very Pythonesque...
-                            ac = self.ac_selected 
-                            list = [ac.getLocation()] + map(Waypoint.getLocation,ac.getWaypoints())
-                            for x in range(0, len(list)-1):
-                            	currP = list[x]
-                            	nextP = list[x+1]
-                                (intersect, dist) = Utility.getPointLineIntersect(currP, nextP, event.pos)
-                                if((intersect != None) and (dist <= 40)):
-                                    newway = Waypoint(event.pos)
-                                    self.ac_selected.addWaypoint(newway, x)
-                                    self.way_clicked = newway
-                                    way_added = True
-                                    break
-                            #TW Fix this as it is sh*t
-                            if (way_added == False and 0 < event.pos[0] < Game.AERIALPANE_W ):
-                                self.requestSelected(None)
-
-            elif(event.type == pygame.MOUSEBUTTONUP and event.button == 1):
-
-                if(self.way_clicked != None):
-                    self.way_clicked = None
-
-            elif(event.type == pygame.MOUSEMOTION):
-			# MOUSEMOTION event has members pos, rel and buttons
-
-                if(self.way_clicked != None):
-                    if(event.pos[0] >= Game.AERIALPANE_W - 3):
-                        self.way_clicked.setLocation((Game.AERIALPANE_W - 3, event.pos[1]))
-                    else:
-                        self.way_clicked.setLocation(event.pos)
-
-            elif(event.type == pygame.KEYDOWN):
-
-                if(event.key == pygame.K_ESCAPE):
+            
+            if self.demomode:
+                if event.type == pygame.MOUSEMOTION or event.type == pygame.MOUSEBUTTONDOWN or event.type == pygame.KEYDOWN:
                     self.gameEndCode = Config.GAME_CODE_USER_END
+                    return
+            else:
+                if(event.type == pygame.MOUSEBUTTONDOWN and event.button == 1):
+    			# MOUSEBUTTONDOWN event has members pos and button
+                    if (self.last_click_time and pygame.time.get_ticks() -  self.last_click_time < 400):
+                        dbl_click = True
+                    else:
+                        dbl_click = False
+                    self.last_click_time = pygame.time.get_ticks()
+    
+                    clickedac = self.__getACClickedOn(event.pos)
+                    if(clickedac != None):
+                        #Clicked an aircraft
+                        self.requestSelected(clickedac)
+                    else:
+                        if(self.ac_selected != None):
+                            #Not clicked aircraft, check waypoints of currently selected ac
+                            wclick = False
+                            for x in range(0, len(self.ac_selected.getWaypoints()) - 1):
+                                w = self.ac_selected.getWaypoints()[x]
+                                if(w.clickedOn(event.pos) == True):
+                                    if (dbl_click):
+                                        # Use del list[index] instead?
+                                        self.ac_selected.waypoints.remove(w)     
+                                        wclick = True
+                                        break
+                                    else:
+                                        self.way_clicked = w
+                                        wclick = True
+                            if wclick == False:
+                                #Not clicked waypoint, check lines
+                                way_added = False
+                                # Still not very Pythonesque...
+                                ac = self.ac_selected 
+                                list = [ac.getLocation()] + map(Waypoint.getLocation,ac.getWaypoints())
+                                for x in range(0, len(list)-1):
+                                    currP = list[x]
+                                    nextP = list[x+1]
+                                    (intersect, dist) = Utility.getPointLineIntersect(currP, nextP, event.pos)
+                                    if((intersect != None) and (dist <= 40)):
+                                        newway = Waypoint(event.pos)
+                                        self.ac_selected.addWaypoint(newway, x)
+                                        self.way_clicked = newway
+                                        way_added = True
+                                        break
+                                #TW Fix this as it is sh*t
+                                if (way_added == False and 0 < event.pos[0] < Game.AERIALPANE_W ):
+                                    self.requestSelected(None)
+    
+                elif(event.type == pygame.MOUSEBUTTONUP and event.button == 1):
+    
+                    if(self.way_clicked != None):
+                        self.way_clicked = None
+    
+                elif(event.type == pygame.MOUSEMOTION):
+    			# MOUSEMOTION event has members pos, rel and buttons
+    
+                    if(self.way_clicked != None):
+                        if(event.pos[0] >= Game.AERIALPANE_W - 3):
+                            self.way_clicked.setLocation((Game.AERIALPANE_W - 3, event.pos[1]))
+                        else:
+                            self.way_clicked.setLocation(event.pos)
+    
+                elif(event.type == pygame.KEYDOWN):    
 
+                    if(event.key == pygame.K_ESCAPE):
+                        self.gameEndCode = Config.GAME_CODE_USER_END
+    
     def __callback_User_End(self):
         self.gameEndCode = Config.GAME_CODE_USER_END
 
@@ -280,7 +287,8 @@ class Game:
 
     def __handleAircraftCollision(self, ac1, ac2):
         if( Utility.locDistSq(ac1.getLocation(), ac2.getLocation()) < (Config.AC_COLLISION_RADIUS ** 2) ):
-            self.gameEndCode = Config.GAME_CODE_AC_COLLIDE
+            if not self.demomode:
+                self.gameEndCode = Config.GAME_CODE_AC_COLLIDE
             self.score += Config.SCORE_AC_COLLIDE
             # Highlight the collided aircraft
             ac1.image = Aircraft.AC_IMAGE_NEAR # later set to Aircraft.AC_IMAGE_COLLIDED
