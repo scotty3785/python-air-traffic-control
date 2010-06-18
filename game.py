@@ -86,7 +86,11 @@ class Game:
 
     def start(self):
         clock = pygame.time.Clock()
-        nextDemoEventTime = random.randint(10000,20000)
+        #nextDemoEventTime = random.randint(10000,20000)
+        nextDemoEventTime = 6000 # first demo event time is 6 seconds after start of demo
+        randAC = None
+        # Delta speed -- shouldn't be hardcoded...
+        ds = 3
 
         #The main game loop
         while self.gameEndCode == 0:
@@ -97,12 +101,17 @@ class Game:
 
             if (self.demomode and self.aircraft):
                 if (self.ms_elapsed > nextDemoEventTime):
+                    nextDemoEventTime += random.randint(10000,20000)
+                    # Select an aircraft at random
                     randIndex = random.choice(range(0,len(self.aircraft)))
                     randAC = self.aircraft[randIndex]
                     randAC.requestSelected()
-                    randSpeedFactor = random.choice([0.5,1.5])
-                    randAC.setSpeed(randAC.getSpeed() * randSpeedFactor)
-                    nextDemoEventTime += random.randint(10000,20000)
+                elif (randAC):
+                    # Ramp the current aircraft's speed up and down
+                    if (randAC.getSpeed() < 110 or randAC.getSpeed() > 990):
+                        ds *= -1 
+                    randAC.setSpeed(randAC.getSpeed() + ds)
+
             
             #Draw background
             pygame.draw.rect(self.screen, (0, 0, 0), self.screen.get_rect())
