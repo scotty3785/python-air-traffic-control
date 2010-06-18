@@ -13,6 +13,11 @@ class Aircraft:
 
     AC_IMAGE_NORMAL = pygame.image.load(os.path.join('data', 'aircraft.png'))
     AC_IMAGE_SELECTED = pygame.image.load(os.path.join('data', 'aircraft_sel.png'))
+    AC_IMAGE_NEAR = pygame.image.load(os.path.join('data', 'aircraft_near.png'))
+
+    AC_STATE_NORMAL = 1
+    AC_STATE_SELECTED = 2
+    AC_STATE_NEAR = 3
 
     EVENT_CLICK_AC = 0
     EVENT_CLICK_FS = 1
@@ -33,6 +38,7 @@ class Aircraft:
         self.waypoints.append(destination)
         self.ident = ident
         self.selected = False
+        self.state = Aircraft.AC_STATE_NORMAL
         self.heading = self.__calculateHeading(self.location, self.waypoints[0].getLocation())
 
         Aircraft.AC_IMAGE_NORMAL.convert_alpha()

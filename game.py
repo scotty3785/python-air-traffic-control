@@ -176,10 +176,10 @@ class Game:
                 a.draw(self.screen)
 
             #Check collisions
+            self.__highlightImpendingCollision(a)
             for ac_t in self.aircraft:
                 if(ac_t != a):
                     self.__handleAircraftCollision(ac_t, a)
-                    self.__highlightImpendingCollision(ac_t, a)
 
         for a in ac_removal:
             if(self.ac_selected == a):
@@ -283,34 +283,22 @@ class Game:
             self.gameEndCode = Config.GAME_CODE_AC_COLLIDE
             self.score += Config.SCORE_AC_COLLIDE
             # Highlight the collided aircraft
-            ac1.image = Aircraft.AC_IMAGE_SELECTED # later set to Aircraft.AC_IMAGE_COLLIDED
-            ac2.image = Aircraft.AC_IMAGE_SELECTED
+            ac1.image = Aircraft.AC_IMAGE_NEAR # later set to Aircraft.AC_IMAGE_COLLIDED
+            ac2.image = Aircraft.AC_IMAGE_NEAR
 
-    def __highlightImpendingCollision(self, ac1, ac2):
-        if (Utility.locDistSq(ac1.getLocation(), ac2.getLocation()) < ((3 * Config.AC_COLLISION_RADIUS) ** 2) ):
-            ac1.image = Aircraft.AC_IMAGE_SELECTED # later set to Aircraft.AC_IMAGE_COLLIDING
-            ac2.image = Aircraft.AC_IMAGE_SELECTED
-            #ac1.addCollisionRisk(ac2)
-            #ac2.addCollisionRisk(ac1)
-        #elif (ac2 in ac1.collisionRisk):
-        #    ac1.image = Aircraft.AC_IMAGE_NORMAL
-        #    ac2.image = Aircraft.AC_IMAGE_NORMAL
-        #    ac1.collisionRisk.remove(ac2)
-        #elif (ac1 in ac1.collisionRisk): 
-        #    ac1.image = Aircraft.AC_IMAGE_NORMAL
-        #    ac2.image = Aircraft.AC_IMAGE_NORMAL
-        #    ac2.collisionRisk.remove(ac1)
-        # Temporary notes: 
-        # This will unhighlight colliding aircraft when they are checked against other aircraft
-        # with which they are not colliding...
-        #else:
-        #    ac1.image = Aircraft.AC_IMAGE_NORMAL
-        #    ac2.image = Aircraft.AC_IMAGE_NORMAL
-        # Need to store which aircraft it was in impending collision with and check against that
-        # aircraft before returning to normal image
-        # Each aircraft could keep a list of aircraft it's nearly in collision with, but what
-        # happens if that aircraft is arrives at its destination -- object is destroyed, so must
-        # check that reference is still valid
+    def __highlightImpendingCollision(self, a):
+        for at in self.aircraft:
+            # Skip current aircraft or currently selected aircraft (because it remains orange)
+            if ((at != a) and (not a.selected)):
+                if (Utility.locDistSq(a.getLocation(), at.getLocation()) < ((3 * Config.AC_COLLISION_RADIUS) ** 2) ):
+                    #a.state = Aircraft.AC_STATE_NEAR
+                    a.image = Aircraft.AC_IMAGE_NEAR
+                    break
+                else:
+                    if (a.selected):
+                        a.image = Aircraft.AC_IMAGE_SELECTED
+                    else:
+                        a.image = Aircraft.AC_IMAGE_NORMAL
 
     def __getACClickedOn(self, clickpos):
         foundac = None
