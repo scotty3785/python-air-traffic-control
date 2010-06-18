@@ -11,7 +11,7 @@ class FlightStripPane(gui.Table):
     
     def addNewFlightStrip(self, ac):
         rows = self.getRows()
-        fs = FlightStrip(ac, width=self.rect.width, height=60, align=-1, valign=-1, background=(0,0,255))
+        fs = FlightStrip(ac, width=self.rect.width, height=60, align=-1, valign=-1, background=(0,200,0))
         self.tr()
         self.td(fs)
        
@@ -54,11 +54,17 @@ class FlightStrip(gui.Container):
     def deselect(self):
         if(self.sel == True):
             self.remove(self.sli_speed)
-            self.style.background = (0, 0, 255)
+            self.style.background = (0, 200, 0)
+            self.l_id.style.color = (255, 255, 255)
+            self.l_heading.style.color = (255, 255, 255)
+            self.l_speed.style.color = (255, 255, 255)
             self.sel = False
         
     def select(self):
         if(self.sel == False):
             self.add(self.sli_speed, 20, 40)
-            self.style.background = (255, 0, 0)
+            self.style.background = (200, 200, 0)
+            self.l_id.style.color = (0, 0, 0)
+            self.l_heading.style.color = (0, 0, 0)
+            self.l_speed.style.color = (0, 0, 0)
             self.sel = True

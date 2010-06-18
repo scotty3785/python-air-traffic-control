@@ -19,7 +19,8 @@ LGRAY = (200, 200, 200)
 DGRAY = (55, 55, 55)
 
 def texty(name,size):
-    Texty = pygame.font.Font(None, size)
+    matched = pygame.font.match_font('verdana, arial')
+    Texty = pygame.font.Font(matched, size)
     return Texty
 
 class Menu:
@@ -111,13 +112,13 @@ class Menu:
 
  
     def start(self):
-        Texty = texty(None,40)
+        Texty = texty(None,30)
         Bigtex = texty(None,60) #large text
         selection = 0
         shift0 = 40
         shift1 = 40
         shift2 = 40
-        START   = Texty.render("START",0,WHITE)
+        START   = Texty.render("START", 0,WHITE)
         DEMO    = Texty.render("DEMO",0,WHITE)
         OPTIONS = Texty.render("HIGH SCORES",0,WHITE)
         EXIT    = Texty.render("EXIT",0,WHITE)

@@ -74,12 +74,12 @@ class Game:
         self.app = gui.App()
         self.cnt_main = gui.Container(align=-1,valign=-1)
         
-        self.btn_game_end = gui.Button(value="End Game", width=Game.FS_W-3, height=60)
-        self.btn_game_end.connect(gui.CLICK, self.__callback_User_End)
+        if not self.demomode:
+            self.btn_game_end = gui.Button(value="End Game", width=Game.FS_W-3, height=60)
+            self.btn_game_end.connect(gui.CLICK, self.__callback_User_End)        
+            self.cnt_main.add(self.btn_game_end, Game.FSPANE_LEFT, Game.FSPANE_TOP - 65)
         
         self.cnt_fspane = FlightStripPane(left=Game.FSPANE_LEFT, top=Game.FSPANE_TOP, width=Game.FS_W, align=-1, valign=-1)
-        
-        self.cnt_main.add(self.btn_game_end, Game.FSPANE_LEFT, Game.FSPANE_TOP - 65)
         self.cnt_main.add(self.cnt_fspane, Game.FSPANE_LEFT, Game.FSPANE_TOP)
 
         self.app.init(self.cnt_main, self.screen)
@@ -137,7 +137,7 @@ class Game:
                 self.screen.blit(sf_score, (Game.FSPANE_LEFT + 30, 10))
                 self.screen.blit(sf_time, (Game.FSPANE_LEFT + 30, 40))
             else:
-                if (self.ms_elapsed / 500) % 2 == 0:
+                if (self.ms_elapsed / 1000) % 2 == 0:
                     sf_demo = pygame.font.Font(None, 50).render("DEMO MODE!", True, (255, 100, 100))
                     self.screen.blit(sf_demo, (Game.FSPANE_LEFT + 15, 10))
             
