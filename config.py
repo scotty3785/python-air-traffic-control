@@ -36,3 +36,5 @@ class Config:
     GAME_FULLSCREEN = True              #Game full screen toggle (debug)
     
     GAME_DEMOMODE = False               #Are we in demo mode?
+    GAME_DEMOTIMEOUT = 6000			
+    #GAME_DEMOTIMEOUT = 60000			#Demo will start after 60 seconds of inactivity

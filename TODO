@@ -5,27 +5,27 @@ PYATC TODO LIST
 Scott
 -----
 
-- High score table
-- Main menu
+- High score table +
+- Main menu +
 
 
 Steve
 -----
 
-- Tidy up event handling
+- Tidy up event handling +
 - Double-click waypoints +
-- Start menu
-- Highlight collisions
-- Flip flight strips (PGU: prevent widget parent container from responding to event)
+- Start menu +
+- Highlight collisions +
+- Flip flight strips (PGU: prevent widget parent container from responding to event) x
 
 Tom
 ---
 
-- Flight strip speed controls
-- Flight strip heading indicators
+- Flight strip speed controls +
+- Flight strip heading indicators + 
 - Waypoint addition                         +
 - Tidy up score/time fonts and background
 - Game end button                           +
 - Fullscreen and resolution-independence    +
 - Aircraft-aircraft collision handling      +
-- Obstacles
+- Obstacles +

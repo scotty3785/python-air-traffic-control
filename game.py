@@ -86,6 +86,7 @@ class Game:
 
     def start(self):
         clock = pygame.time.Clock()
+        nextDemoEventTime = random.randint(10000,20000)
 
         #The main game loop
         while self.gameEndCode == 0:
@@ -93,6 +94,15 @@ class Game:
 
             #Handle any UI stuff
             self.__handleUserInteraction()
+
+            if (self.demomode and self.aircraft):
+                if (self.ms_elapsed > nextDemoEventTime):
+                    randIndex = random.choice(range(0,len(self.aircraft)))
+                    randAC = self.aircraft[randIndex]
+                    randAC.requestSelected()
+                    randSpeedFactor = random.choice([0.5,1.5])
+                    randAC.setSpeed(randAC.getSpeed() * randSpeedFactor)
+                    nextDemoEventTime += random.randint(10000,20000)
             
             #Draw background
             pygame.draw.rect(self.screen, (0, 0, 0), self.screen.get_rect())

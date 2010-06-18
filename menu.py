@@ -37,6 +37,7 @@ class Menu:
         self.screen = screen
         self.menuEnd = 0
         self.selection = 0
+        self.timeWithoutUIEvent = 0
         #Initialisation Stuff Done
 
     def __mouseMenuOver(self,pos):
@@ -64,8 +65,10 @@ class Menu:
                 return -1
 
     def __handleUserInteraction(self):
+        
         for event in pygame.event.get():
             if(event.type == pygame.MOUSEBUTTONDOWN):
+                self.timeWithoutUIEvent = 0
                 ret = self.__mouseMenuSelection(event.pos)
                 if (ret == 3):
                     self.menuEnd = Config.CODE_KILL
@@ -77,6 +80,7 @@ class Menu:
                     self.menuEnd = Config.MENU_CODE_START
                 break
             elif(event.type == pygame.MOUSEMOTION):
+                self.timeWithoutUIEvent = 0
                 a = self.__mouseMenuOver(event.pos)
                 if (0 <= a <= 3):
                     self.selection = a
@@ -84,6 +88,7 @@ class Menu:
                 self.menuEnd = Config.CODE_KILL
                 break
             elif(event.type == pygame.KEYDOWN):
+                self.timeWithoutUIEvent = 0
                 if(event.key == pygame.K_ESCAPE):
                     self.menuEnd = Config.CODE_KILL
                     break
@@ -103,6 +108,7 @@ class Menu:
                     elif (self.selection == 0):
                         self.menuEnd = Config.MENU_CODE_START
                     break
+
  
     def start(self):
         Texty = texty(None,40)
@@ -126,6 +132,10 @@ class Menu:
   
         while self.menuEnd == 0:
             timepassed = clock.tick(Config.FRAMERATE)
+            self.timeWithoutUIEvent += timepassed
+            if (self.timeWithoutUIEvent > Config.GAME_DEMOTIMEOUT):
+                self.menuEnd = Config.MENU_CODE_DEMO
+                self.timeWithoutUIEvent = 0
             
             self.__handleUserInteraction()
 
