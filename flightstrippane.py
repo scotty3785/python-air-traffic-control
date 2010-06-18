@@ -48,6 +48,7 @@ class FlightStrip(gui.Container):
     def updateAllFields(self):
         self.l_id.value = self.ac.getIdent()
         self.l_speed.value = "Speed: " + str(self.ac.getSpeed()) + "kts"
+        self.sli_speed.value = self.ac.getSpeed()
         self.l_heading.value = "Hdg: " + self.ac.getHeadingStr()
         
     def deselect(self):

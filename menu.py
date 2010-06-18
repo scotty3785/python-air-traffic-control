@@ -67,13 +67,13 @@ class Menu:
         for event in pygame.event.get():
             if(event.type == pygame.MOUSEBUTTONDOWN):
                 ret = self.__mouseMenuSelection(event.pos)
-                if (self.selection == 3):
+                if (ret == 3):
                     self.menuEnd = Config.CODE_KILL
-                elif (self.selection == 2):
+                elif (ret == 2):
                     self.menuEnd = Config.MENU_CODE_HIGH_SCORE
-                elif (self.selection == 1):
+                elif (ret == 1):
                     self.menuEnd = Config.MENU_CODE_DEMO
-                elif (self.selection == 0):
+                elif (ret == 0):
                     self.menuEnd = Config.MENU_CODE_START
                 break
             elif(event.type == pygame.MOUSEMOTION):
@@ -93,7 +93,7 @@ class Menu:
                 elif(event.key == pygame.K_DOWN):
                     self.selection = (self.selection + 1) % 4
                     break
-                elif(event.key == pygame.K_SPACE):
+                elif(event.key == pygame.K_SPACE or event.key == pygame.K_RETURN or event.key == pygame.K_KP_ENTER):
                     if (self.selection == 3):
                         self.menuEnd = Config.CODE_KILL
                     elif (self.selection == 2):

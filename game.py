@@ -120,17 +120,16 @@ class Game:
             pygame.draw.line(self.screen, (255, 255, 255), (Game.AERIALPANE_W + 1, 0), (Game.AERIALPANE_W + 1, Game.SCREEN_H), 3)
             pygame.draw.line(self.screen, (255, 255, 255), (Game.FSPANE_LEFT, Game.FSPANE_TOP - 2), (Game.SCREEN_W, Game.FSPANE_TOP - 2), 3)
 
-            #Draw flightstrips
-            #for n in range(0, len(self.aircraft)):
-            #    self.aircraft[n].drawFlightstrip(self.screen, pygame.Rect((Game.FSPANE_LEFT, Game.FSPANE_TOP + (n * Game.FS_H)), (Game.FS_W, Game.FS_H)))
-
-            #Draw score/time indicators
-            sf_score = self.font.render("Score: " + str(self.score), True, Game.COLOR_SCORETIME)
-            sf_time = self.font.render("Time: " + str( math.floor((Config.GAMETIME - self.ms_elapsed) / 1000) ), True, Game.COLOR_SCORETIME)
-
             if self.demomode == False:
+                #Draw score/time indicators
+                sf_score = self.font.render("Score: " + str(self.score), True, Game.COLOR_SCORETIME)
+                sf_time = self.font.render("Time: " + str( math.floor((Config.GAMETIME - self.ms_elapsed) / 1000) ), True, Game.COLOR_SCORETIME)
                 self.screen.blit(sf_score, (Game.FSPANE_LEFT + 30, 10))
                 self.screen.blit(sf_time, (Game.FSPANE_LEFT + 30, 40))
+            else:
+                if (self.ms_elapsed / 500) % 2 == 0:
+                    sf_demo = pygame.font.Font(None, 50).render("DEMO MODE!", True, (255, 100, 100))
+                    self.screen.blit(sf_demo, (Game.FSPANE_LEFT + 15, 10))
             
             #Recalc time and check for game end
             self.ms_elapsed = self.ms_elapsed + timepassed
