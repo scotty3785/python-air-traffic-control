@@ -38,3 +38,6 @@ class Config:
     GAME_DEMOMODE = False               #Are we in demo mode?
     GAME_DEMOTIMEOUT = 6000			
     #GAME_DEMOTIMEOUT = 60000			#Demo will start after 60 seconds of inactivity
+
+    GAME_HIGHSCORE_ENTRIES = 30         #Number of scores to show on the high score list
+                                        #DO NOT EXCEED 30 ENTRIES.

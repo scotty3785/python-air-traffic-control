@@ -1,11 +1,30 @@
-default,3380,Gabriel,None
-default,2580,Joseph ,None
-default,2200,Kim,None
-default,2100,murry,None
-default,2000,Peter,None
-default,1860,lol,None
-default,1620,Ian C,None
-default,1600,phillip bowden,None
-default,1400,Ryan Biss,None
-default,960,francis,None
-defauldefault,300,emilee,None
+default,20,ATC Noob,None
+default,20,ATC Noob,None
+default,20,ATC Noob,None
+default,20,ATC Noob,None
+default,20,ATC Noob,None
+default,20,ATC Noob,None
+default,20,ATC Noob,None
+default,20,ATC Noob,None
+default,20,ATC Noob,None
+default,20,ATC Noob,None
+default,20,ATC Noob,None
+default,20,ATC Noob,None
+default,20,ATC Noob,None
+default,20,ATC Noob,None
+default,20,ATC Noob,None
+default,20,ATC Noob,None
+default,20,ATC Noob,None
+default,20,ATC Noob,None
+default,20,ATC Noob,None
+default,20,ATC Noob,None
+default,20,ATC Noob,None
+default,20,ATC Noob,None
+default,20,ATC Noob,None
+default,20,ATC Noob,None
+default,20,ATC Noob,None
+default,20,ATC Noob,None
+default,20,ATC Noob,None
+default,20,ATC Noob,None
+default,20,ATC Noob,None
+default,20,ATC Noob,None

@@ -31,7 +31,7 @@ class HighScore:
         #self.font = pygame.font.Font(None, 30)
         self.highEnd = 0
         self.selection = 0
-        self.hiScore = Highs('score.txt',10)
+        self.hiScore = Highs('score.txt',Config.GAME_HIGHSCORE_ENTRIES)
         self.hiScore.load()
         self.myScores = self.hiScore['default']
         self.scoretable = ""
@@ -98,11 +98,15 @@ class HighScore:
         
         #data contains the html to be parsed on to the screen. This section sets up the table and the table headers
         data = "<table border=1 width=100% align='center' style='border:1px; border-color: #000088; background: #ccccff; margin: 20px; padding: 20px;'>"
-        data += "<tr><td width=100%><b>Player</b></th><td width=100%><b>Score</b></th></tr>"
+        data += "<tr><td width=100%><b>Position</b></td><td width=100%><b>Player</b></td><td width=100%><b>Score</b></td></tr>"
         
+        count = 0
         #Iterate each item in the high score list and add each as a row to the table
         for e in self.myScores:
             data += "<tr>"
+            data += "<td>"
+            data += PositionText(count)
+            data += "</td>"
             data += "<td>"
             data += e.name
             data += "</td>"
@@ -110,6 +114,7 @@ class HighScore:
             data += str(e.score)
             data += "</td>"
             data += "</tr>"
+            count = count + 1
 
         #Close the table
         data += "</table>"
@@ -120,7 +125,7 @@ class HighScore:
         #Display the table until the user exits
         while (self.highEnd == 0):
             self.__handleUserInteraction()
-            html.write(self.screen,self.font,pygame.Rect(300,200,600,500),data)
+            html.write(self.screen,self.font,pygame.Rect(300,25,700,700),data)
             pygame.display.flip()
         return self.highEnd
 
