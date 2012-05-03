@@ -68,12 +68,15 @@ class AircraftSpawnEvent:
     @staticmethod
     def __generateRandomSpawnPoint(screen_w, screen_h):
         side = random.randint(1, 4)
-        if side == 1:
+        previous = 7
+        if side == 1 and side != previous:
             loc = (random.randint(0, screen_w), 0)
-        elif side == 2:
+        elif side == 2 and side != previous:
             loc = (screen_w, random.randint(0, screen_h))
-        elif side == 3:
+        elif side == 3 and side != previous:
             loc = (random.randint(0, screen_w), screen_h)
-        elif side == 4:
+        elif side == 4 and side != previous:
             loc = (0, random.randint(0, screen_h))
+
+        previous = side
         return (loc), side
