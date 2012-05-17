@@ -19,6 +19,7 @@ class Main:
     def __init__(self):
         #Init the modules we need
         display.init()
+        pygame.mixer.init()
         font.init()
         
         if(Config.GAME_FULLSCREEN == True):
@@ -35,6 +36,7 @@ class Main:
         state = STATE_MENU
         exit = 0
         score = 0
+
         while (exit == 0):
              if (state == STATE_MENU):
                  menuEndCode = None

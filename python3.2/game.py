@@ -4,6 +4,7 @@
 import pygame;
 import random;
 import math;
+import pygame;
 from config import *;
 from destination import *;
 from aircraft import *;
@@ -31,7 +32,9 @@ class Game:
     RADAR_RADIUS = 0
 
     COLOR_SCORETIME = (20, 193, 236)    #Score/time counter colour
+
     
+
     def __init__(self, screen, demomode):
         #Screen vars
         Game.SCREEN_W = screen.get_size()[0]
@@ -313,6 +316,7 @@ class Game:
             ac1.image = Aircraft.AC_IMAGE_NEAR # later set to Aircraft.AC_IMAGE_COLLIDED
             ac2.image = Aircraft.AC_IMAGE_NEAR
 
+
     def __highlightImpendingCollision(self, a):
         for at in self.aircraft:
             # Skip current aircraft or currently selected aircraft (because it remains orange)
@@ -320,6 +324,9 @@ class Game:
                 if (Utility.locDistSq(a.getLocation(), at.getLocation()) < ((3 * Config.AC_COLLISION_RADIUS) ** 2) ):
                     #a.state = Aircraft.AC_STATE_NEAR
                     a.image = Aircraft.AC_IMAGE_NEAR
+                    sound = pygame.mixer.Sound("data/sounds/warning.ogg")
+                    channel = sound.play()
+                    #channel.set_volume(1, 1)
                     break
                 else:
                     if (a.selected):
@@ -386,7 +393,12 @@ class Game:
             b.connect(gui.CLICK,okcb,bob)
             c = gui.Container()
 
+
             if(self.gameEndCode == Config.GAME_CODE_AC_COLLIDE):
+                # load a sound file into memory
+                sound = pygame.mixer.Sound("data/sounds/boom.wav")
+                channel = sound.play()
+                channel.set_volume(2, 2)
                 c.add(gui.Label("COLLISION!!!!"), 0, 0)
             elif(self.gameEndCode == Config.GAME_CODE_TIME_UP):
                 c.add(gui.Label("Time up!"), 0, 0)
