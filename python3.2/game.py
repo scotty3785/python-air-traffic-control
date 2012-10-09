@@ -149,10 +149,13 @@ class Game:
                 self.screen.blit(sf_score, (Game.FSPANE_LEFT + 30, 10))
                 self.screen.blit(sf_time, (Game.FSPANE_LEFT + 30, 40))
             else:
-                if (self.ms_elapsed / 1000) % 2 == 0:
+                #if (self.ms_elapsed / 1000) % 2 == 0:
                     sf_demo = pygame.font.Font(None, 50).render("DEMO MODE!", True, (255, 100, 100))
                     self.screen.blit(sf_demo, (Game.FSPANE_LEFT + 15, 10))
-            
+
+                    mvmouse_demo = pygame.font.Font(None, 50).render("Move mouse!", True, (255, 100, 100))
+                    self.screen.blit(mvmouse_demo, (Game.FSPANE_LEFT + 15, 50))
+                    
             #Recalc time and check for game end
             self.ms_elapsed = self.ms_elapsed + timepassed
             if(self.ms_elapsed >= Config.GAMETIME and not self.demomode):
@@ -324,8 +327,9 @@ class Game:
                 if (Utility.locDistSq(a.getLocation(), at.getLocation()) < ((3 * Config.AC_COLLISION_RADIUS) ** 2) ):
                     #a.state = Aircraft.AC_STATE_NEAR
                     a.image = Aircraft.AC_IMAGE_NEAR
-                    sound = pygame.mixer.Sound("data/sounds/warning.ogg")
-                    channel = sound.play()
+                    if self.demomode == False:
+                        sound = pygame.mixer.Sound("data/sounds/warning.ogg")
+                        channel = sound.play()
                     #channel.set_volume(1, 1)
                     break
                 else:
