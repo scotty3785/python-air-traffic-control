@@ -143,6 +143,9 @@ class Game:
             pygame.draw.line(self.screen, (255, 255, 255), (Game.FSPANE_LEFT, Game.FSPANE_TOP - 2), (Game.SCREEN_W, Game.FSPANE_TOP - 2), 3)
 
             if self.demomode == False:
+                #if self.score is negative cap it at 0.
+                if self.score <= 0:
+                    self.score = 0
                 #Draw score/time indicators
                 sf_score = self.font.render("Score: " + str(self.score), True, Game.COLOR_SCORETIME)
                 sf_time = self.font.render("Time: " + str( math.floor((Config.GAMETIME - self.ms_elapsed) / 1000) ), True, Game.COLOR_SCORETIME)
