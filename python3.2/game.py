@@ -73,7 +73,13 @@ class Game:
         self.__generateDestinations()
         self.__generateObstacles()
         self.__generateAircraftSpawnEvents()
-
+        
+        # Preload sounds.
+        self.sound_warning = pygame.mixer.Sound("data/sounds/warning.ogg")
+        self.sound_collision = pygame.mixer.Sound("data/sounds/boom.wav")
+        self.channel_warning = pygame.mixer.Channel(0)
+        self.channel_collision = pygame.mixer.Channel(1)
+        
         self.app = gui.App()
         self.cnt_main = gui.Container(align=-1,valign=-1)
         
@@ -331,9 +337,9 @@ class Game:
                     #a.state = Aircraft.AC_STATE_NEAR
                     a.image = Aircraft.AC_IMAGE_NEAR
                     if self.demomode == False:
-                        sound = pygame.mixer.Sound("data/sounds/warning.ogg")
-                        channel = sound.play()
-                    #channel.set_volume(1, 1)
+                        #Checking if the sound is already playing. (Happens alot)
+                        if not self.channel_warning.get_busy():
+                            self.channel_warning.play(self.sound_warning)
                     break
                 else:
                     if (a.selected):
@@ -355,7 +361,7 @@ class Game:
     def __generateAircraftSpawnEvents(self):
         (self.aircraftspawntimes, self.aircraftspawns) = AircraftSpawnEvent.generateGameSpawnEvents(Game.AERIALPANE_W, Game.AERIALPANE_H, self.destinations)
         while self.__areSpawnEventsTooClose(self.aircraftspawntimes, self.aircraftspawns) == True:
-            (self.aicraftspawntime, self.aircraftspawns) = AircraftSpawnEvent.generateGameSpawnEvents(Game.AERIALPANE_W, Game.AERIALPANE_H, self.destinations)
+            (self.aircraftspawntimes, self.aircraftspawns) = AircraftSpawnEvent.generateGameSpawnEvents(Game.AERIALPANE_W, Game.AERIALPANE_H, self.destinations)
 
     def __areSpawnEventsTooClose(self, times, spawns):
         ret = False
@@ -402,10 +408,9 @@ class Game:
 
 
             if(self.gameEndCode == Config.GAME_CODE_AC_COLLIDE):
-                # load a sound file into memory
-                sound = pygame.mixer.Sound("data/sounds/boom.wav")
-                channel = sound.play()
-                channel.set_volume(2, 2)
+                # Check if sound is playing and if not play it. (Probably never happen in this call)
+                if not self.channel_collision.get_busy():
+                    self.channel_collision.play(self.sound_collision)
                 c.add(gui.Label("COLLISION!!!!"), 0, 0)
             elif(self.gameEndCode == Config.GAME_CODE_TIME_UP):
                 c.add(gui.Label("Time up!"), 0, 0)
