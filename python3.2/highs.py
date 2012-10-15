@@ -44,12 +44,10 @@ class HighScore:
                 self.highEnd = Config.GAME_CODE_USER_END
             elif(event.type == pygame.QUIT):
                 self.highEnd = Config.GAME_CODE_USER_END
-                break
             elif(event.type == pygame.KEYDOWN):
                 if(event.key == pygame.K_ESCAPE):
                     self.highEnd = Config.GAME_CODE_USER_END
-                    break
- 
+         
     def start(self,score):   
         self.highEnd = 0            
         clock = pygame.time.Clock()
@@ -127,6 +125,7 @@ class HighScore:
             self.__handleUserInteraction()
             html.write(self.screen,self.font,pygame.Rect(300,25,700,700),data)
             pygame.display.flip()
+        pygame.event.clear()
         return self.highEnd
 
 if __name__ == '__main__':
