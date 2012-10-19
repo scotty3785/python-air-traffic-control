@@ -30,14 +30,14 @@ class Main:
         else:
             self.screen = display.set_mode((1024, 768))
             
-        display.set_caption('ATC Version 0.1')
+        display.set_caption('ATC Version 1')
 
         self.menu = main_menu.main_menu(self.screen)
         self.ages = ages_menu.ages_menu(self.screen)
         self.high = HighScore(self.screen)
         self.infologger = info_logger.info_logger("config.ini")
         #Current visitor number
-        self.id = 0
+        self.id = int(self.infologger.get_id())
 
     def run(self):
         state = STATE_MENU
@@ -82,7 +82,6 @@ class Main:
             elif (state == STATE_KILL):
                 exit = 1
             elif (state == STATE_AGES):
-                print(state)
                 self.infologger.add_value(self.id,'agegroup',self.ages.main_loop())
                 state = STATE_GAME
             game = None

@@ -1,5 +1,6 @@
 import csv
 import configparser
+import os
 
 class info_logger:
     def __init__(self,configfile):
@@ -7,9 +8,28 @@ class info_logger:
         self.config.read_file(open(configfile))
         self.dictkeys = eval(self.config['logger']['dictkeys'])
         self.logfile = self.config['logger']['logfile']
+        self.dictlist = []
+        writelater = self.check_exists()
         self.csvwriter = csv.DictWriter(open(self.logfile,"w"),self.dictkeys)
         self.csvwriter.writeheader()
         self.workingdict = dict(zip(self.dictkeys,[None]*10))
+        self.id = 0
+        if writelater:
+            for row in self.dictlist:
+                self.workingdict = row
+                self.writeout()
+            self.id = self.dictlist[-1]['id']
+    
+    def check_exists(self):
+        if os.path.exists(self.logfile):
+            with open(self.logfile) as f:
+                csvreader = csv.DictReader(f)
+                for row in csvreader:
+                    self.dictlist.append(row)
+            return True
+            
+    def get_id(self):
+        return self.id
     
     def add_value(self,id,key,value):
         if key not in self.dictkeys or id == None:
