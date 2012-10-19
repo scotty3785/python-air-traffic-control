@@ -76,8 +76,8 @@ class Aircraft:
         return ret
         
     def getHeadingStr(self):
-        hdg = self.getHeading()
-        hdg_str = format(hdg, ">03")
+        hdg = str(self.getHeading())
+        hdg_str = hdg.split(".")[0] + "." + hdg.split(".")[1][0:2]
         return hdg_str
         
     def getIdent(self):
