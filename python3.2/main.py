@@ -30,7 +30,7 @@ class Main:
         else:
             self.screen = display.set_mode((1024, 768))
             
-        display.set_caption('ATC Version 1')
+        display.set_caption('ATC Version 2')
 
         self.menu = main_menu.main_menu(self.screen)
         self.ages = ages_menu.ages_menu(self.screen)
