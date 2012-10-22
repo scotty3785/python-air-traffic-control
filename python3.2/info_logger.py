@@ -10,7 +10,8 @@ class info_logger:
         self.logfile = self.config['logger']['logfile']
         self.dictlist = []
         writelater = self.check_exists()
-        self.csvwriter = csv.DictWriter(open(self.logfile,"w"),self.dictkeys)
+        self.file = open(self.logfile,"w")
+        self.csvwriter = csv.DictWriter(self.file,self.dictkeys)
         self.csvwriter.writeheader()
         self.workingdict = dict(zip(self.dictkeys,[None]*10))
         self.id = 0
@@ -18,7 +19,11 @@ class info_logger:
             for row in self.dictlist:
                 self.workingdict = row
                 self.writeout()
-            self.id = self.dictlist[-1]['id']
+            try:
+                self.id = self.dictlist[-1]['id']
+            except IndexError:
+                print("!!!!!CSV not written out properly to disk from previous run!!!!!")
+                
     
     def check_exists(self):
         if os.path.exists(self.logfile):
@@ -42,3 +47,5 @@ class info_logger:
         if self.workingdict['id'] != None:
             self.csvwriter.writerow(self.workingdict)
             self.workingdict = dict(zip(self.dictkeys,[None]*10))
+            self.file.flush()
+            os.fsync(self.file.fileno())
