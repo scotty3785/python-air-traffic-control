@@ -51,7 +51,7 @@ class Obstacle:
     def isColliding(self, point):
         collide = False
         #Don't bother with the masky stuff if the ac is outside rect
-        if(self.rect.collidepoint(point) == True):
+        if(self.rect.collidepoint(point) == True and self.type != Obstacle.TYPE_WEATHER):
             acLocOffsetX = int(point[0] - self.rect.left)
             acLocOffsetY = int(point[1] - self.rect.top)
             if(self.mask.get_at((acLocOffsetX, acLocOffsetY)) != 0):
