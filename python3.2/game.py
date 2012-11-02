@@ -82,11 +82,15 @@ class Game:
         
         self.app = gui.App()
         self.cnt_main = gui.Container(align=-1,valign=-1)
+        self.delaytimer = 0
         
         if not self.demomode:
             self.btn_game_end = gui.Button(value="End Game", width=Game.FS_W-3, height=60)
             self.btn_game_end.connect(gui.CLICK, self.__callback_User_End)        
             self.cnt_main.add(self.btn_game_end, Game.FSPANE_LEFT, Game.FSPANE_TOP - 65)
+        else:
+            pygame.mouse.set_visible(False)
+            self.delaytimer = pygame.time.get_ticks()
         
         self.cnt_fspane = FlightStripPane(left=Game.FSPANE_LEFT, top=Game.FSPANE_TOP, width=Game.FS_W, align=-1, valign=-1)
         self.cnt_main.add(self.cnt_fspane, Game.FSPANE_LEFT, Game.FSPANE_TOP)
@@ -240,9 +244,11 @@ class Game:
             self.app.event(event)
             
             if self.demomode:
-                if event.type == pygame.MOUSEMOTION or event.type == pygame.MOUSEBUTTONDOWN or event.type == pygame.KEYDOWN:
-                    self.gameEndCode = Config.GAME_CODE_USER_END
-                    return
+                if (pygame.time.get_ticks() - self.delaytimer) >= 1000:
+                    if event.type == pygame.MOUSEMOTION or event.type == pygame.MOUSEBUTTONDOWN or event.type == pygame.KEYDOWN:
+                        self.gameEndCode = Config.GAME_CODE_USER_END
+                        pygame.mouse.set_visible(True)
+                        return
             else:
                 if(event.type == pygame.MOUSEBUTTONDOWN and event.button == 1):
     			# MOUSEBUTTONDOWN event has members pos and button
