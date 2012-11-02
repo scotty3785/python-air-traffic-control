@@ -30,8 +30,8 @@ class Destination(Waypoint):
 	##    return (self.way_rect.inflate(15,15).collidepoint(clickpos))
 	##  AttributeError: Destination instance has no attribute 'way_rect'
 	# Does not fix the problem though... still get the same error
-	def clickedOn(self, clickpos):
-		return False
+    def clickedOn(self, clickpos):
+        return False
 		
     @staticmethod
     def generateGameDestinations(screen_w, screen_h):

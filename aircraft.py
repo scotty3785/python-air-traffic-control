@@ -56,9 +56,9 @@ class Aircraft:
             self.heading = self.__calculateHeading(self.location, self.waypoints[0].getLocation())
 
 	#Get the specified waypoint from the list
-	def getWaypoint(self, index):
-		return self.waypoints[index]
-
+    def getWaypoint(self, index):
+        return self.waypoints[index]
+    
     def getWaypoints(self):
         return self.waypoints
 
@@ -76,8 +76,8 @@ class Aircraft:
         return ret
         
     def getHeadingStr(self):
-        hdg = self.getHeading()
-        hdg_str = format(hdg, ">03")
+        hdg = str(self.getHeading())
+        hdg_str = hdg.split(".")[0]
         return hdg_str
         
     def getIdent(self):
@@ -128,9 +128,9 @@ class Aircraft:
         y = self.location[1]
         list = [self.ident, "FL" + str(self.altitude/100), str(self.speed) + "kts"]
         for line in list:
-			id = self.font.render(line, False, self.fs_font_color)
-			r = surface.blit(id, (x,y))
-			y = y + self.font.get_height()
+            id = self.font.render(line, False, self.fs_font_color)
+            r = surface.blit(id, (x,y))
+            y = y + self.font.get_height()
 
 	#Location/heading update function
     def update(self):

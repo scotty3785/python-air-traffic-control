@@ -1,8 +1,18 @@
-"""a html renderer
+"""Code for html rendering
 """
 
 import sys
-import htmllib
+
+# Import the html parser code, maintaing compatibility with older versions of python
+if (sys.version_info[0] < 3):
+    # Import the old style htmllib parser
+    import htmllib
+    from htmllib import HTMLParser
+else:
+    # Import the new html.parser module
+    from html.parser import HTMLParser
+    htmllib = None
+
 import re
 import pygame
 from pygame.locals import *
@@ -54,7 +64,7 @@ class _hr(gui.Color):
         #print self.rect
         #self.rect.w = 1
 
-class _html(htmllib.HTMLParser):
+class _html(HTMLParser):
     def init(self,doc,font,color,_globals,_locals,loader=None):
         self.mystack = []
         self.document = doc
@@ -84,14 +94,31 @@ class _html(htmllib.HTMLParser):
         if not self.font: self.font = self.myfont
         if not self.color: self.color = self.mycolor
         
-    def myclose(self,type_):
-        t = None
+    def myclose(self, tag):
         self.mydone()
-        while t != type_:
-            #if len(self.mystack)==0: return
-            t,w = self.mystack.pop()
-        t,w = self.mystack.pop()
-        self.myopen(t,w)
+        n = len(self.mystack)-1
+        while (n >= 0):
+            (t, w) = self.mystack[n]
+            if (t == tag):
+                # Found the tag in the stack. Drop everything from that tag onwards
+                # from the stack.
+                self.mystack = self.mystack[0:n]
+                # Pop off the parent element, then add it back on to set the
+                # font, color, etc.
+                # TODO - tacky
+                t,w = self.mystack.pop()
+                self.myopen(t,w)
+                break
+            n -= 1
+
+#        t = None
+#        while t != type_:
+#            if len(self.mystack)==0:
+#                # Closing a tag that was never opened
+#                break
+#            t,w = self.mystack.pop()
+#        t,w = self.mystack.pop()
+#        self.myopen(t,w)
         
     def myback(self,type_):
         if type(type_) == str: type_ = [type_,]
@@ -354,15 +381,11 @@ class _html(htmllib.HTMLParser):
     def start_object(self,attrs):
         r = self.attrs_to_map(attrs)
         params = self.map_to_params(r)
-        code = "e = %s(**params)"%r['type']
-        #print code
-        #print params
-        exec(code)
-        #print e
-        #print e.style.width,e.style.height
+        # Use eval to automagically get the class being refered
+        cls = eval(r["type"])
+        e = cls(**params)
         self.map_to_connects(e,r)
         self.item.add(e)
-        
         self._locals[r.get('id',None)] = e
     
     def start_select(self,attrs):
@@ -396,7 +419,6 @@ class _html(htmllib.HTMLParser):
         r = self.attrs_to_map(attrs)
         params = self.map_to_params(r)
         params['style']['padding'] = h
-        print params
 
         self.item.block(0)
         self.item.add(_hr(**params))
@@ -426,7 +448,7 @@ class _html(htmllib.HTMLParser):
             else:
                 self.item.add(w)
         except:
-            print 'handle_image: missing %s'%src
+            print('handle_image: missing %s'%src)
                 
     def handle_data(self,txt):
         if self.type == 'table': return 
@@ -460,21 +482,51 @@ class _html(htmllib.HTMLParser):
             w = gui.Image(self.font.render(word,1,self.color))
             self.item.add(w)
             self.item.space(self.font.size(" "))
-            
+
+if (sys.version_info[0] >= 3):
+    # These functions are for compatibility with python 3, where it seems that HTMLParser 
+    # was rewritten to be more general. There is a problem though, since python pre 3 
+    # defines these same functions with an extra argument. So we have to include them
+    # conditionally, depending on whether we're using python 2 or 3. Ugh.
+    def handle_starttag(this, tag, attrs):
+        func = getattr(this, "start_" + tag, None)
+        if (not func):
+            print("ERROR - unrecognized tag %s" % tag)
+            return
+        func(attrs)
+
+    def handle_endtag(this, tag):
+        func = getattr(this, "end_" + tag, None)
+        if (func):
+            func()
+
+    def start_img(this, attrs):
+#        src = ""
+#        align = ""
+#        for (key, value) in attrs:
+#            if (key == "src"): src = value
+#            elif (key == "align"): align = value
+        args = this.attrs_to_map(attrs)
+        src = args.get("src", "")
+        align = args.get("align", "")
+        this.handle_image(src, "", "", align, "", "")
+
+    _html.handle_starttag = handle_starttag
+    _html.handle_endtag = handle_endtag
+    _html.start_img = start_img
+
 
 class HTML(gui.Document):
-    """a gui HTML object
+    """A gui HTML object
+
+    Arguments:
+        data -- html data
+        globals -- global variables (for scripting)
+        locals -- local variables (for scripting)
+        loader -- the resource loader
     
-    <pre>HTML(data,globals=None,locals=None)</pre>
-        
-    <dl>    
-    <dt>data <dd>html data
-    <dt>globals <dd>global variables (for scripting)
-    <dt>locals <dd>local variables (for scripting)
-    <dt>loader <dd>the resource loader
-    </dl>
-    
-    <p>you may access html elements that have an id via widget[id]</p>
+    You may access html elements that have an id via widget[id]
+
     """
     def __init__(self,data,globals=None,locals=None,loader=None,**params):
         gui.Document.__init__(self,**params)
@@ -490,7 +542,11 @@ class HTML(gui.Document):
         self._locals = _locals
         
         #font = gui.theme.get("label","","font")
-        p = _html(htmllib.AS_IS,0)
+        if (htmllib):
+            # The constructor is slightly different
+            p = _html(None, 0)
+        else:
+            p = _html()
         p.init(self,self.style.font,self.style.color,_globals,_locals,
                loader=loader)
         p.feed(data) 
@@ -542,30 +598,20 @@ def render_ext(font, rect, text, aa, color, bgcolor=(0,0,0,0), **params):
     return (surf, htm)
 
 def render(font, rect, text, aa, color, bgcolor=(0,0,0,0), **params):
-    """Renders some html
-    
-    <pre>render(font,rect,text,aa,color,bgcolor=(0,0,0,0))</pre>
-    """
+    """Renders some html"""
     return render_ext(font, rect, text, aa, color, bgcolor, **params)[0]
 
 def rendertrim(font,rect,text,aa,color,bgcolor=(0,0,0,0),**params):
-    """render html, and make sure to trim the size
-    
-    rendertrim(font,rect,text,aa,color,bgcolor=(0,0,0,0))
-    """
+    """Render html, and make sure to trim the size."""
     # Render the HTML
     (surf, htm) = render_ext(font, rect, text, aa, color, bgcolor, **params)
     return surf.subsurface(htm.get_bounding_box())
 
     
 def write(s,font,rect,text,aa=0,color=(0,0,0), **params):
-    """write html to a surface
-    
-    write(s,font,rect,text,aa=0,color=(0,0,0))
-    """
+    """Write html to a surface."""
     htm = HTML(text, font=font, color=color, **params)
     htm.resize(width=rect.w)
     s = s.subsurface(rect)
     htm.paint(s)
     
-# vim: set filetype=python sts=4 sw=4 noet si :

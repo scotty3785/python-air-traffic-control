@@ -20,7 +20,8 @@ class AircraftSpawnEvent:
 
     @staticmethod
     def valid_destinations(destinations,test1,test2):
-        d = filter(test1,destinations)
+        #d = filter(test1,destinations)
+        d = [item for item in destinations if test1(item)]
         if (len(d) == 0):
             return destinations
         else:

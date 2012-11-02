@@ -94,8 +94,8 @@ class Menu:
                     self.menuEnd = Config.CODE_KILL
                     break
                 elif(event.key == pygame.K_UP):
-					self.selection = (self.selection - 1) % 4
-					break
+                    self.selection = (self.selection - 1) % 4
+                    break
                 elif(event.key == pygame.K_DOWN):
                     self.selection = (self.selection + 1) % 4
                     break

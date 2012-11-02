@@ -4,6 +4,7 @@
 import pygame;
 import random;
 import math;
+import pygame;
 from config import *;
 from destination import *;
 from aircraft import *;
@@ -31,7 +32,9 @@ class Game:
     RADAR_RADIUS = 0
 
     COLOR_SCORETIME = (20, 193, 236)    #Score/time counter colour
+
     
+
     def __init__(self, screen, demomode):
         #Screen vars
         Game.SCREEN_W = screen.get_size()[0]
@@ -70,14 +73,24 @@ class Game:
         self.__generateDestinations()
         self.__generateObstacles()
         self.__generateAircraftSpawnEvents()
-
+        
+        # Preload sounds.
+        self.sound_warning = pygame.mixer.Sound("data/sounds/warning.ogg")
+        self.sound_collision = pygame.mixer.Sound("data/sounds/boom.wav")
+        self.channel_warning = pygame.mixer.Channel(0)
+        self.channel_collision = pygame.mixer.Channel(1)
+        
         self.app = gui.App()
         self.cnt_main = gui.Container(align=-1,valign=-1)
+        self.delaytimer = 0
         
         if not self.demomode:
             self.btn_game_end = gui.Button(value="End Game", width=Game.FS_W-3, height=60)
             self.btn_game_end.connect(gui.CLICK, self.__callback_User_End)        
             self.cnt_main.add(self.btn_game_end, Game.FSPANE_LEFT, Game.FSPANE_TOP - 65)
+        else:
+            pygame.mouse.set_visible(False)
+            self.delaytimer = pygame.time.get_ticks()
         
         self.cnt_fspane = FlightStripPane(left=Game.FSPANE_LEFT, top=Game.FSPANE_TOP, width=Game.FS_W, align=-1, valign=-1)
         self.cnt_main.add(self.cnt_fspane, Game.FSPANE_LEFT, Game.FSPANE_TOP)
@@ -121,9 +134,9 @@ class Game:
                 x.draw(self.screen)
 
             #Draw radar circles
-            pygame.draw.circle(self.screen, Game.RADAR_CIRC_COLOR, (Game.AERIALPANE_W / 2, Game.AERIALPANE_H / 2), Game.RADAR_RADIUS * 1/3, 1)
-            pygame.draw.circle(self.screen, Game.RADAR_CIRC_COLOR, (Game.AERIALPANE_W / 2, Game.AERIALPANE_H / 2), Game.RADAR_RADIUS * 2/3, 1)
-            pygame.draw.circle(self.screen, Game.RADAR_CIRC_COLOR, (Game.AERIALPANE_W / 2, Game.AERIALPANE_H / 2), Game.RADAR_RADIUS, 1)
+            pygame.draw.circle(self.screen, Game.RADAR_CIRC_COLOR, (int(Game.AERIALPANE_W / 2), int(Game.AERIALPANE_H / 2)), int(Game.RADAR_RADIUS * 1/3), 1)
+            pygame.draw.circle(self.screen, Game.RADAR_CIRC_COLOR, (int(Game.AERIALPANE_W / 2), int(Game.AERIALPANE_H / 2)), int(Game.RADAR_RADIUS * 2/3), 1)
+            pygame.draw.circle(self.screen, Game.RADAR_CIRC_COLOR, (int(Game.AERIALPANE_W / 2), int(Game.AERIALPANE_H / 2)), int(Game.RADAR_RADIUS), 1)
 
             #Draw destinations
             for x in self.destinations:
@@ -140,16 +153,22 @@ class Game:
             pygame.draw.line(self.screen, (255, 255, 255), (Game.FSPANE_LEFT, Game.FSPANE_TOP - 2), (Game.SCREEN_W, Game.FSPANE_TOP - 2), 3)
 
             if self.demomode == False:
+                #if self.score is negative cap it at 0.
+                if self.score <= 0:
+                    self.score = 0
                 #Draw score/time indicators
                 sf_score = self.font.render("Score: " + str(self.score), True, Game.COLOR_SCORETIME)
                 sf_time = self.font.render("Time: " + str( math.floor((Config.GAMETIME - self.ms_elapsed) / 1000) ), True, Game.COLOR_SCORETIME)
                 self.screen.blit(sf_score, (Game.FSPANE_LEFT + 30, 10))
                 self.screen.blit(sf_time, (Game.FSPANE_LEFT + 30, 40))
             else:
-                if (self.ms_elapsed / 1000) % 2 == 0:
+                #if (self.ms_elapsed / 1000) % 2 == 0:
                     sf_demo = pygame.font.Font(None, 50).render("DEMO MODE!", True, (255, 100, 100))
                     self.screen.blit(sf_demo, (Game.FSPANE_LEFT + 15, 10))
-            
+
+                    mvmouse_demo = pygame.font.Font(None, 50).render("Move mouse!", True, (255, 100, 100))
+                    self.screen.blit(mvmouse_demo, (Game.FSPANE_LEFT + 15, 50))
+                    
             #Recalc time and check for game end
             self.ms_elapsed = self.ms_elapsed + timepassed
             if(self.ms_elapsed >= Config.GAMETIME and not self.demomode):
@@ -225,9 +244,11 @@ class Game:
             self.app.event(event)
             
             if self.demomode:
-                if event.type == pygame.MOUSEMOTION or event.type == pygame.MOUSEBUTTONDOWN or event.type == pygame.KEYDOWN:
-                    self.gameEndCode = Config.GAME_CODE_USER_END
-                    return
+                if (pygame.time.get_ticks() - self.delaytimer) >= 1000:
+                    if event.type == pygame.MOUSEMOTION or event.type == pygame.MOUSEBUTTONDOWN or event.type == pygame.KEYDOWN:
+                        self.gameEndCode = Config.GAME_CODE_USER_END
+                        pygame.mouse.set_visible(True)
+                        return
             else:
                 if(event.type == pygame.MOUSEBUTTONDOWN and event.button == 1):
     			# MOUSEBUTTONDOWN event has members pos and button
@@ -260,11 +281,12 @@ class Game:
                                 #Not clicked waypoint, check lines
                                 way_added = False
                                 # Still not very Pythonesque...
-                                ac = self.ac_selected 
-                                list = [ac.getLocation()] + map(Waypoint.getLocation,ac.getWaypoints())
-                                for x in range(0, len(list)-1):
-                                    currP = list[x]
-                                    nextP = list[x+1]
+                                ac = self.ac_selected
+                                listy = [ac.getLocation()]
+                                listy = listy + list(map(Waypoint.getLocation,ac.getWaypoints()))
+                                for x in range(0, len(listy)-1):
+                                    currP = listy[x]
+                                    nextP = listy[x+1]
                                     (intersect, dist) = Utility.getPointLineIntersect(currP, nextP, event.pos)
                                     if((intersect != None) and (dist <= 40)):
                                         newway = Waypoint(event.pos)
@@ -312,6 +334,7 @@ class Game:
             ac1.image = Aircraft.AC_IMAGE_NEAR # later set to Aircraft.AC_IMAGE_COLLIDED
             ac2.image = Aircraft.AC_IMAGE_NEAR
 
+
     def __highlightImpendingCollision(self, a):
         for at in self.aircraft:
             # Skip current aircraft or currently selected aircraft (because it remains orange)
@@ -319,6 +342,10 @@ class Game:
                 if (Utility.locDistSq(a.getLocation(), at.getLocation()) < ((3 * Config.AC_COLLISION_RADIUS) ** 2) ):
                     #a.state = Aircraft.AC_STATE_NEAR
                     a.image = Aircraft.AC_IMAGE_NEAR
+                    if self.demomode == False:
+                        #Checking if the sound is already playing. (Happens alot)
+                        if not self.channel_warning.get_busy():
+                            self.channel_warning.play(self.sound_warning)
                     break
                 else:
                     if (a.selected):
@@ -340,7 +367,7 @@ class Game:
     def __generateAircraftSpawnEvents(self):
         (self.aircraftspawntimes, self.aircraftspawns) = AircraftSpawnEvent.generateGameSpawnEvents(Game.AERIALPANE_W, Game.AERIALPANE_H, self.destinations)
         while self.__areSpawnEventsTooClose(self.aircraftspawntimes, self.aircraftspawns) == True:
-            (self.aicraftspawntime, self.aircraftspawns) = AircraftSpawnEvent.generateGameSpawnEvents(Game.AERIALPANE_W, Game.AERIALPANE_H, self.destinations)
+            (self.aircraftspawntimes, self.aircraftspawns) = AircraftSpawnEvent.generateGameSpawnEvents(Game.AERIALPANE_W, Game.AERIALPANE_H, self.destinations)
 
     def __areSpawnEventsTooClose(self, times, spawns):
         ret = False
@@ -385,7 +412,11 @@ class Game:
             b.connect(gui.CLICK,okcb,bob)
             c = gui.Container()
 
+
             if(self.gameEndCode == Config.GAME_CODE_AC_COLLIDE):
+                # Check if sound is playing and if not play it. (Probably never happen in this call)
+                if not self.channel_collision.get_busy():
+                    self.channel_collision.play(self.sound_collision)
                 c.add(gui.Label("COLLISION!!!!"), 0, 0)
             elif(self.gameEndCode == Config.GAME_CODE_TIME_UP):
                 c.add(gui.Label("Time up!"), 0, 0)
