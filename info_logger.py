@@ -1,14 +1,12 @@
 import csv
-import configparser
+import conf
 import os
 
 class info_logger:
     def __init__(self,configfile):
-        self.config = configparser.ConfigParser()
-        self.config.read_file(open(configfile))
-        self.dictkeys = eval(self.config['logger']['dictkeys'])
-        self.logfile = self.config['logger']['logfile']
+        self.dictkeys = conf.loaded['logger']['dictkeys']
         self.dictlist = []
+        self.logfile = conf.loaded['logger']['logfile']
         writelater = self.check_exists()
         self.file = open(self.logfile,"w")
         self.csvwriter = csv.DictWriter(self.file,self.dictkeys)

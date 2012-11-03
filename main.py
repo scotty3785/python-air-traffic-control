@@ -2,11 +2,10 @@
 
 from pygame import *
 from game import *
-import main_menu
 from highs import *
 import os
 import info_logger
-import ages_menu
+import menu_base
 
 STATE_MENU = 1
 STATE_GAME = 2
@@ -14,6 +13,7 @@ STATE_DEMO = 3
 STATE_HIGH = 4
 STATE_KILL = 5
 STATE_AGES = 6
+STATE_OPTS = 7
 
 class Main:
 
@@ -32,8 +32,10 @@ class Main:
             
         display.set_caption('ATC Version 2')
 
-        self.menu = main_menu.main_menu(self.screen)
-        self.ages = ages_menu.ages_menu(self.screen)
+        self.menu = menu_base.menu_base(self.screen,150,25)
+        self.menu.from_file('main_menu')
+        self.ages = menu_base.menu_base(self.screen,150,25)
+        self.ages.from_file('ages_menu')
         self.high = HighScore(self.screen)
         self.infologger = info_logger.info_logger("config.ini")
         #Current visitor number

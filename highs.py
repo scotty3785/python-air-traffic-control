@@ -44,7 +44,7 @@ class HighScore:
                 self.highEnd = Config.GAME_CODE_USER_END
             elif(event.type == pygame.QUIT):
                 self.highEnd = Config.GAME_CODE_USER_END
-            elif(event.type == pygame.KEYDOWN):
+            elif(event.type == pygame.KEYUP):
                 if(event.key == pygame.K_ESCAPE):
                     self.highEnd = Config.GAME_CODE_USER_END
          

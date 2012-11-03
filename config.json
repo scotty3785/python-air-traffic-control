@@ -1,0 +1,39 @@
+{
+	"menus":{
+	 "main_menu": {
+		"title":"Main Menu",
+		"titleRGB":[255,255,255],
+		"titlesize":75,
+		"buttons":[
+			{ "text":"Start Game", "code":3 },
+			{ "text":"Demo", "code":4 },
+			{ "text":"Options","code":6},
+			{ "text":"High Scores", "code":5 },
+			{ "text":"Exit Game", "code":-10 }
+		]
+	},
+	 "ages_menu": {
+		"title":"Choose your age",
+		"titleRGB":[255,255,255],
+		"titlesize":75,
+		"buttons":[
+			{ "text":"0-13", "code":"0-13" },
+			{ "text":"14-21", "code":"14-21" },
+			{ "text":"22-30", "code":"22-30" },
+			{ "text":"31-40", "code":"31-40" },
+			{ "text":"41-50", "code":"41-50" },
+			{ "text":"51+", "code":"51+" }
+		]
+	}
+	},
+	"logger":{
+		"dictkeys":["id","agegroup","difficulty","score"],
+		"logfile":"visitorlog.csv"
+	}
+}
+	
+		
+
+	
+	
+	
