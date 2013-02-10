@@ -1,13 +1,13 @@
 #   File: aircraft.py
 
-import math;
-import pygame;
-import os;
-import string;
-from config import *;
-from waypoint import *;
-from utility import *;
-from game import *;
+import math
+import pygame
+import os
+import string
+import conf
+from waypoint import *
+from utility import *
+from game import *
 
 class Aircraft:
 
@@ -51,7 +51,7 @@ class Aircraft:
 
 	#Add a new waypoint in the specified index in the list
     def addWaypoint(self, waypoint, index=0):
-        if(len(self.waypoints) < Config.MAX_WAYPOINTS + 1):
+        if(len(self.waypoints) < conf.get()['aircraft']['max_waypoints'] + 1):
             self.waypoints.insert(index, waypoint)
             self.heading = self.__calculateHeading(self.location, self.waypoints[0].getLocation())
 
@@ -110,8 +110,8 @@ class Aircraft:
         rect.center = self.location
         surface.blit(rot_image, rect)
 
-        if(Config.AC_DRAW_COLLISION_RADIUS == True):
-            pygame.draw.circle(surface, (255, 255, 0), self.location, Config.AC_COLLISION_RADIUS, 1)
+        if(conf.get()['aircraft']['draw_radius'] == True):
+            pygame.draw.circle(surface, (255, 255, 0), self.location, conf.get()['aircraft']['collision_radius'], 1)
 
         #Draw lines and waypoints if selected
         if(self.selected == True):
@@ -165,14 +165,14 @@ class Aircraft:
 
 	#Calculate new location based on current location, heading and speed
     def __calculateNewLocation(self, location, heading, speed):
-        x_diff = (speed / Config.AC_SPEED_SCALEFACTOR) * math.sin(math.radians(heading))
-        y_diff = -(speed / Config.AC_SPEED_SCALEFACTOR) * math.cos(math.radians(heading))
+        x_diff = (speed / conf.get()['aircraft']['speed_scalefactor']) * math.sin(math.radians(heading))
+        y_diff = -(speed / conf.get()['aircraft']['speed_scalefactor']) * math.cos(math.radians(heading))
         location = (location[0] + x_diff, location[1] + y_diff)
         return location
 
 	#Check whether I have reached the given waypoint
     def __reachedWaypoint(self, location, waypoint):
-        if Utility.locDistSq(location, waypoint) < ((self.speed/Config.AC_SPEED_SCALEFACTOR) ** 2):
+        if Utility.locDistSq(location, waypoint) < ((self.speed/conf.get()['aircraft']['speed_scalefactor']) ** 2):
             return True
         else:
             return False

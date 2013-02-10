@@ -1,7 +1,7 @@
 #	File: aircraftspawnevent.py
 
-from config import *;
-import random;
+import conf
+import random
 
 class AircraftSpawnEvent:
 
@@ -32,8 +32,8 @@ class AircraftSpawnEvent:
     def generateGameSpawnEvents(screen_w, screen_h, destinations):
         randtime = [1]
         randspawnevent = []
-        for x in range(1, Config.NUMBEROFAIRCRAFT):
-            randtime.append(random.randint(1, Config.GAMETIME))
+        for x in range(1, conf.get()['game']['n_aircraft']):
+            randtime.append(random.randint(1, conf.get()['game']['gametime']))
         randtime.sort()
         for x in randtime:
             randspawn, side = AircraftSpawnEvent.__generateRandomSpawnPoint(screen_w, screen_h)

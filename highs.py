@@ -6,8 +6,7 @@ import pygame
 from pygame import *
 import os
 import math
-import config
-from config import *
+import conf
 import sys; sys.path.append("pgu")
 from pgu import high, gui, html
 
@@ -31,7 +30,7 @@ class HighScore:
         #self.font = pygame.font.Font(None, 30)
         self.highEnd = 0
         self.selection = 0
-        self.hiScore = Highs('score.txt',Config.GAME_HIGHSCORE_ENTRIES)
+        self.hiScore = Highs('score.txt',conf.get()['game']['n_highscores'])
         self.hiScore.load()
         self.myScores = self.hiScore['default']
         self.scoretable = ""
@@ -40,13 +39,12 @@ class HighScore:
     def __handleUserInteraction(self):
         for event in pygame.event.get():
             if(event.type == pygame.MOUSEBUTTONUP):
-                pass
-                self.highEnd = Config.GAME_CODE_USER_END
+                self.highEnd = conf.get()['codes']['user_end']
             elif(event.type == pygame.QUIT):
-                self.highEnd = Config.GAME_CODE_USER_END
+                self.highEnd = conf.get()['codes']['user_end']
             elif(event.type == pygame.KEYUP):
                 if(event.key == pygame.K_ESCAPE):
-                    self.highEnd = Config.GAME_CODE_USER_END
+                    self.highEnd = conf.get()['codes']['user_end']
          
     def start(self,score):   
         self.highEnd = 0            

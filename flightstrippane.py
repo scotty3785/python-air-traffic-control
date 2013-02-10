@@ -1,8 +1,8 @@
 #File:  flightstrippane.py
 
-import math;
-from pgu import gui;
-from config import *;
+import math
+from pgu import gui
+import conf
 
 class FlightStripPane(gui.Table):
 
@@ -32,7 +32,7 @@ class FlightStrip(gui.Container):
         self.l_heading = gui.Label("Hdg: " + self.ac.getHeadingStr(), color=(255, 255, 255))
         self.add(self.l_heading, 50, 2)
         
-        self.sli_speed = gui.HSlider(self.ac.getSpeed(), Config.AC_SPEED_MIN, Config.AC_SPEED_MAX, 10, step=50, width=140)
+        self.sli_speed = gui.HSlider(self.ac.getSpeed(), conf.get()['aircraft']['speed_min'], conf.get()['aircraft']['speed_max'], 10, step=50, width=140)
         self.sli_speed.connect(gui.CHANGE, self.__slider_change)
         
         self.connect(gui.CLICK, self.__handle_Click)

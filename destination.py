@@ -1,10 +1,10 @@
 #   File: destination.py
 #   Author: Tom Woolfrey
 
-import pygame;
-import random;
-from config import *;
-from waypoint import *;
+import pygame
+import random
+import conf
+from waypoint import *
 
 class Destination(Waypoint):
 
@@ -36,7 +36,7 @@ class Destination(Waypoint):
     @staticmethod
     def generateGameDestinations(screen_w, screen_h):
         ret = []
-        for x in range(0, Config.NUMBEROFDESTINATIONS):
+        for x in range(0, conf.get()['game']['n_destinations']):
             randx = random.randint( 20, screen_w - 20 )
             randy = random.randint( 20, screen_h - 20 )
             dest = Destination((randx, randy), "D" + str(x))

@@ -3,7 +3,7 @@
 import pygame;
 import os;
 import random;
-from config import *;
+import conf
 
 class Obstacle:
 
@@ -62,7 +62,7 @@ class Obstacle:
     def generateGameObstacles(screen_w, screen_h, destinations):
         ret = []
         x = 0
-        while x < Config.NUMBEROFOBSTACLES:
+        while x < conf.get()['game']['n_obstacles']:
             randtype = random.randint(0, 1)
             randx = random.randint( 40, screen_w - 100 )
             randy = random.randint( 40, screen_h - 80 )            

@@ -52,7 +52,7 @@ class menu_base:
             button_widget = gui.Button(value=button['text'],width=self.button_width,height=self.button_height)
             button_widget.connect(gui.CLICK,self.menu_callback,button['button_code'])
             self.container.add(button_widget,((self.SURFACE_W/2) - (self.button_width/2)),(button_start_height + ((button['position']+1) * self.button_height) + ((button['position']) * self.separator)))
-        ourfont = pygame.font.Font(pygame.font.match_font('verdana, arial'),self.titlesize)
+        ourfont = pygame.font.Font(pygame.font.match_font('geinspirapitch, geinspira, arial'),self.titlesize)
         text_widget = gui.basic.Label(self.title,color=self.titlecolour,font=ourfont)
         text_w,text_h = ourfont.size(self.title)
         self.container.add(text_widget,((self.SURFACE_W/2)-(text_w/2)),(button_start_height/2))
@@ -85,7 +85,7 @@ class menu_base:
     
 
     def from_file(self,menu_name):
-        data = conf.loaded["menus"][menu_name]
+        data = conf.get()["menus"][menu_name]
         self.add_title(data['title'])
         self.titlecolour = data['titleRGB']
         self.titlesize = data['titlesize']

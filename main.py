@@ -6,6 +6,7 @@ from highs import *
 import os
 import info_logger
 import menu_base
+import conf
 
 STATE_MENU = 1
 STATE_GAME = 2
@@ -13,7 +14,6 @@ STATE_DEMO = 3
 STATE_HIGH = 4
 STATE_KILL = 5
 STATE_AGES = 6
-STATE_OPTS = 7
 
 class Main:
 
@@ -25,7 +25,7 @@ class Main:
         pygame.mixer.init()
         font.init()
         
-        if(Config.GAME_FULLSCREEN == True):
+        if(conf.get()['game']['fullscreen'] == True):
             self.screen = display.set_mode((0, 0), pygame.FULLSCREEN)
         else:
             self.screen = display.set_mode((1024, 768))
@@ -51,27 +51,27 @@ class Main:
                 menuEndCode = None
                 menuEndCode = self.menu.main_loop()
                 self.infologger.writeout()
-                if (menuEndCode == Config.MENU_CODE_START):
+                if (menuEndCode == conf.get()['codes']['start']):
                     state = STATE_AGES
                     self.id += 1
                     self.infologger.add_value(self.id,'id',self.id)
-                elif (menuEndCode == Config.MENU_CODE_DEMO):
+                elif (menuEndCode == conf.get()['codes']['demo']):
                     state = STATE_DEMO
-                elif (menuEndCode == Config.MENU_CODE_HIGH_SCORE):
+                elif (menuEndCode == conf.get()['codes']['high_score']):
                     state = STATE_HIGH
-                elif (menuEndCode == Config.CODE_KILL):
+                elif (menuEndCode == conf.get()['codes']['kill']):
                     state = STATE_KILL
             elif (state == STATE_GAME):
                 game = Game(self.screen, False)
                 (gameEndCode, score) = game.start()
                 self.infologger.add_value(self.id,'score',score)
-                if (gameEndCode == Config.GAME_CODE_TIME_UP):
+                if (gameEndCode == conf.get()['codes']['time_up']):
                     state = STATE_HIGH
-                elif (gameEndCode == Config.CODE_KILL):
+                elif (gameEndCode == conf.get()['codes']['kill']):
                     state = STATE_KILL
-                elif (gameEndCode == Config.GAME_CODE_USER_END):
+                elif (gameEndCode == conf.get()['codes']['user_end']):
                     state = STATE_MENU
-                elif (gameEndCode == Config.GAME_CODE_AC_COLLIDE):
+                elif (gameEndCode == conf.get()['codes']['ac_collide']):
                     state = STATE_HIGH
             elif (state == STATE_DEMO):
                game = Game(self.screen, True)

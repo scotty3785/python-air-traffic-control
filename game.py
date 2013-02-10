@@ -1,18 +1,18 @@
 #   File: game.py
 #   Description: An instance of one game of ATC
 
-import pygame;
-import random;
-import math;
-import pygame;
-from config import *;
-from destination import *;
-from aircraft import *;
-from obstacle import *;
-from aircraftspawnevent import *;
-from utility import *;
-from pgu import gui;
-from flightstrippane import *;
+import pygame
+import random
+import math
+import pygame
+import conf
+from destination import *
+from aircraft import *
+from obstacle import *
+from aircraftspawnevent import *
+from utility import *
+from pgu import gui
+from flightstrippane import *
 
 class Game:
 
@@ -107,7 +107,7 @@ class Game:
 
         #The main game loop
         while self.gameEndCode == 0:
-            timepassed = clock.tick(Config.FRAMERATE)
+            timepassed = clock.tick(conf.get()['game']['framerate'])
 
             #Handle any UI stuff
             self.__handleUserInteraction()
@@ -158,7 +158,7 @@ class Game:
                     self.score = 0
                 #Draw score/time indicators
                 sf_score = self.font.render("Score: " + str(self.score), True, Game.COLOR_SCORETIME)
-                sf_time = self.font.render("Time: " + str( math.floor((Config.GAMETIME - self.ms_elapsed) / 1000) ), True, Game.COLOR_SCORETIME)
+                sf_time = self.font.render("Time: " + str( math.floor((conf.get()['game']['gametime'] - self.ms_elapsed) / 1000) ), True, Game.COLOR_SCORETIME)
                 self.screen.blit(sf_score, (Game.FSPANE_LEFT + 30, 10))
                 self.screen.blit(sf_time, (Game.FSPANE_LEFT + 30, 40))
             else:
@@ -171,9 +171,9 @@ class Game:
                     
             #Recalc time and check for game end
             self.ms_elapsed = self.ms_elapsed + timepassed
-            if(self.ms_elapsed >= Config.GAMETIME and not self.demomode):
-                self.gameEndCode = Config.GAME_CODE_TIME_UP
-                
+            if(self.ms_elapsed >= conf.get()['game']['gametime'] and not self.demomode):
+                self.gameEndCode = conf.get()['codes']['time_up']
+            
             #Flip the framebuffers
             self.app.repaint()
             self.app.update(self.screen)
@@ -210,7 +210,7 @@ class Game:
             if(reachdest == True):
                 #Schedule aircraft for removal
                 ac_removal.append(a)
-                self.score += Config.SCORE_REACHDEST
+                self.score += conf.get()['scoring']['reach_dest']
             else:
                 a.draw(self.screen)
 
@@ -226,16 +226,20 @@ class Game:
             self.aircraft.remove(a)
             self.cnt_fspane.remove(a.getFS())
 
-        #4: Spawn new aircraft due for spawning
+        #4: Spawn new aircraft due for spawning (or if in demo, regenerate list if none left)
         if(len(self.aircraftspawntimes) != 0):
             if self.ms_elapsed >= self.aircraftspawntimes[0]:
                 sp = self.aircraftspawns[0]
                 if(len(self.aircraft) < math.floor(Game.FSPANE_H / 60)):
-                    ac = Aircraft(self, sp.getSpawnPoint(), Config.AC_SPEED_DEFAULT, sp.getDestination(), "BA" + str(random.randint(1, 100)))
+                    ac = Aircraft(self, sp.getSpawnPoint(), conf.get()['aircraft']['speed_default'], sp.getDestination(), "BA" + str(random.randint(1, 100)))
                     self.aircraft.append(ac)
                     self.cnt_fspane.addNewFlightStrip(ac)
                 self.aircraftspawns.remove(sp)
                 self.aircraftspawntimes.remove(self.aircraftspawntimes[0])
+        elif self.demomode:
+            self.ms_eleapsed = 0
+            self.__generateAircraftSpawnEvents()
+            print("reset")
 
     def __handleUserInteraction(self):
 
@@ -246,7 +250,7 @@ class Game:
             if self.demomode:
                 if (pygame.time.get_ticks() - self.delaytimer) >= 1000:
                     if event.type == pygame.MOUSEMOTION or event.type == pygame.MOUSEBUTTONDOWN or event.type == pygame.KEYDOWN:
-                        self.gameEndCode = Config.GAME_CODE_USER_END
+                        self.gameEndCode = conf.get()['codes']['user_end']
                         pygame.mouse.set_visible(True)
                         return
             else:
@@ -315,21 +319,21 @@ class Game:
                 elif(event.type == pygame.KEYDOWN):    
 
                     if(event.key == pygame.K_ESCAPE):
-                        self.gameEndCode = Config.GAME_CODE_USER_END
+                        self.gameEndCode = conf.get()['codes']['user_end']
     
     def __callback_User_End(self):
-        self.gameEndCode = Config.GAME_CODE_USER_END
+        self.gameEndCode = conf.get()['codes']['user_end']
 
     def __handleAircraftObstacleCollisions(self):
         for o in self.obstacles:
             newCollides = o.collideAircraft(self.aircraft)
-            self.score += (newCollides * Config.SCORE_OBS_COLLIDE)
+            self.score += (newCollides * conf.get()['scoring']['obs_collide'])
 
     def __handleAircraftCollision(self, ac1, ac2):
-        if( Utility.locDistSq(ac1.getLocation(), ac2.getLocation()) < (Config.AC_COLLISION_RADIUS ** 2) ):
+        if( Utility.locDistSq(ac1.getLocation(), ac2.getLocation()) < (conf.get()['aircraft']['collision_radius'] ** 2) ):
             if not self.demomode:
-                self.gameEndCode = Config.GAME_CODE_AC_COLLIDE
-            self.score += Config.SCORE_AC_COLLIDE
+                self.gameEndCode = conf.get()['codes']['ac_collide']
+            self.score += conf.get()['scoring']['ac_collide']
             # Highlight the collided aircraft
             ac1.image = Aircraft.AC_IMAGE_NEAR # later set to Aircraft.AC_IMAGE_COLLIDED
             ac2.image = Aircraft.AC_IMAGE_NEAR
@@ -339,7 +343,7 @@ class Game:
         for at in self.aircraft:
             # Skip current aircraft or currently selected aircraft (because it remains orange)
             if ((at != a) and (not a.selected)):
-                if (Utility.locDistSq(a.getLocation(), at.getLocation()) < ((3 * Config.AC_COLLISION_RADIUS) ** 2) ):
+                if (Utility.locDistSq(a.getLocation(), at.getLocation()) < ((3 * conf.get()['aircraft']['collision_radius']) ** 2) ):
                     #a.state = Aircraft.AC_STATE_NEAR
                     a.image = Aircraft.AC_IMAGE_NEAR
                     if self.demomode == False:
@@ -398,7 +402,7 @@ class Game:
 
     def __displayPostGameDialog(self):
         #Do post-loop actions (game over dialogs)
-        if(self.gameEndCode != Config.GAME_CODE_USER_END and self.gameEndCode != Config.CODE_KILL):
+        if(self.gameEndCode != conf.get()['codes']['user_end'] and self.gameEndCode != conf.get()['codes']['kill']):
             l = gui.Label("Game Over!")
             b = gui.Button("OK")
            
@@ -413,12 +417,12 @@ class Game:
             c = gui.Container()
 
 
-            if(self.gameEndCode == Config.GAME_CODE_AC_COLLIDE):
+            if(self.gameEndCode == conf.get()['codes']['ac_collide']):
                 # Check if sound is playing and if not play it. (Probably never happen in this call)
                 if not self.channel_collision.get_busy():
                     self.channel_collision.play(self.sound_collision)
                 c.add(gui.Label("COLLISION!!!!"), 0, 0)
-            elif(self.gameEndCode == Config.GAME_CODE_TIME_UP):
+            elif(self.gameEndCode == conf.get()['codes']['time_up']):
                 c.add(gui.Label("Time up!"), 0, 0)
 
             c.add(b,0,30)
@@ -430,7 +434,7 @@ class Game:
             #pygame.time.delay(3000)
             clock = pygame.time.Clock()
             while(not bob[0]):
-                timepassed = clock.tick(Config.FRAMERATE)
+                timepassed = clock.tick(conf.get()['game']['framerate'])
                 for e in pygame.event.get():
                     self.app.event(e)
                 self.app.repaint()

@@ -1,6 +1,6 @@
 import json
 
-configfile = "config.json"
+configfile = "config_game.json"
 loaded = ""
 
 def writeout():
@@ -12,4 +12,9 @@ def load():
     with open(configfile) as f:
         loaded = json.load(f)
 
+def get():
+    global loaded
+    return loaded
+    
 load()
+        
