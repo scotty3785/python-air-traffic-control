@@ -65,7 +65,6 @@ class menu_base:
         self.app.event(event)
     
     def update(self):
-        self.app.repaint()
         self.app.update(self.surface)
         
     def main_loop(self):
@@ -73,6 +72,7 @@ class menu_base:
         if not self.finalized:
             self.finalize_buttons()
         pygame.draw.rect(self.surface, (0, 0, 0), self.surface.get_rect())
+        self.app.repaint()
         while code == None:
             for event in pygame.event.get():
                 self.event(event)
