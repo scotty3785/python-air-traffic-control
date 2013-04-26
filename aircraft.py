@@ -121,7 +121,7 @@ class Aircraft:
                 point_list.append(self.waypoints[x].getLocation())
                 self.waypoints[x].draw(surface)
             point_list.append(self.waypoints[-1].getLocation())
-            pygame.draw.aalines(surface, (255, 255, 0), False, point_list)
+            pygame.draw.lines(surface, (255, 255, 0), False, point_list)
 
 		# Draw the ident string next to the aircraft?
         x = self.location[0] + 20
