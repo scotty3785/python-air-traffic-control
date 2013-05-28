@@ -3,7 +3,7 @@ import conf
 import os
 
 class info_logger:
-    def __init__(self,configfile):
+    def __init__(self):
         self.dictkeys = conf.loaded['logger']['dictkeys']
         self.dictlist = []
         self.logfile = conf.loaded['logger']['logfile']

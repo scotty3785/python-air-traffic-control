@@ -26,7 +26,7 @@ class Main:
         font.init()
         
         if(conf.get()['game']['fullscreen'] == True):
-            self.screen = display.set_mode((0, 0), pygame.FULLSCREEN)
+            self.screen = display.set_mode((1024, 768), pygame.FULLSCREEN)
         else:
             self.screen = display.set_mode((1024, 768))
             
@@ -37,7 +37,7 @@ class Main:
         self.ages = menu_base.menu_base(self.screen,150,25)
         self.ages.from_file('ages_menu')
         self.high = HighScore(self.screen)
-        self.infologger = info_logger.info_logger("config.ini")
+        self.infologger = info_logger.info_logger()
         #Current visitor number
         self.id = int(self.infologger.get_id())
 
