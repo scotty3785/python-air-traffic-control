@@ -83,7 +83,7 @@ class Game:
         self.app = gui.App()
         self.cnt_main = gui.Container(align=-1,valign=-1)
         self.delaytimer = 0
-        
+
         if not self.demomode:
             self.btn_game_end = gui.Button(value="End Game", width=Game.FS_W-3, height=60)
             self.btn_game_end.connect(gui.CLICK, self.__callback_User_End)        
@@ -105,13 +105,15 @@ class Game:
         # Delta speed -- shouldn't be hardcoded...
         ds = 3
 
+        #Blank whole screen once.
+        pygame.draw.rect(self.screen, (0, 0, 0), self.screen.get_rect())
+
         #The main game loop
         while self.gameEndCode == 0:
             timepassed = clock.tick(conf.get()['game']['framerate'])
-
+            self.screen.set_clip(pygame.Rect(0,0,Game.FSPANE_LEFT,Game.SCREEN_H))
             #Handle any UI stuff
             self.__handleUserInteraction()
-
             if (self.demomode and self.aircraft):
                 if (self.ms_elapsed > nextDemoEventTime):
                     nextDemoEventTime += random.randint(10000,20000)
@@ -145,13 +147,14 @@ class Game:
             #Move/redraw/collide aircraft
             self.__update()
             self.__handleAircraftObstacleCollisions()
-
+            
+            self.screen.set_clip(None)
             #Draw black rect over RHS of screen, to occult bits of plane/obstacle that may be there
-            pygame.draw.rect(self.screen, (0, 0, 0), pygame.Rect((Game.FSPANE_LEFT, 0), (Game.SCREEN_W - 1 - Game.FSPANE_LEFT, Game.FSPANE_TOP - 4)))
-            pygame.draw.rect(self.screen, (0, 0, 0), pygame.Rect((Game.FSPANE_LEFT, Game.FSPANE_TOP), (Game.SCREEN_W - 1 - Game.FSPANE_LEFT, Game.SCREEN_H - Game.FSPANE_TOP)))
+            #pygame.draw.rect(self.screen, (0, 0, 0), pygame.Rect((Game.FSPANE_LEFT, 0), (Game.SCREEN_W - 1 - Game.FSPANE_LEFT, Game.FSPANE_TOP - 4)))
+            #pygame.draw.rect(self.screen, (0, 0, 0), pygame.Rect((Game.FSPANE_LEFT, Game.FSPANE_TOP), (Game.SCREEN_W - 1 - Game.FSPANE_LEFT, Game.SCREEN_H - Game.FSPANE_TOP)))
             pygame.draw.line(self.screen, (255, 255, 255), (Game.AERIALPANE_W + 1, 0), (Game.AERIALPANE_W + 1, Game.SCREEN_H), 3)
             pygame.draw.line(self.screen, (255, 255, 255), (Game.FSPANE_LEFT, Game.FSPANE_TOP - 2), (Game.SCREEN_W, Game.FSPANE_TOP - 2), 3)
-
+            
             if self.demomode == False:
                 #if self.score is negative cap it at 0.
                 if self.score <= 0:
@@ -159,6 +162,8 @@ class Game:
                 #Draw score/time indicators
                 sf_score = self.font.render("Score: " + str(self.score), True, Game.COLOR_SCORETIME)
                 sf_time = self.font.render("Time: " + str( math.floor((conf.get()['game']['gametime'] - self.ms_elapsed) / 1000) ), True, Game.COLOR_SCORETIME)
+                self.screen.fill((0,0,0),sf_score.get_rect().move(Game.FSPANE_LEFT + 30, 10))
+                self.screen.fill((0,0,0),sf_time.get_rect().move(Game.FSPANE_LEFT + 30, 40))
                 self.screen.blit(sf_score, (Game.FSPANE_LEFT + 30, 10))
                 self.screen.blit(sf_time, (Game.FSPANE_LEFT + 30, 40))
             else:
@@ -173,9 +178,7 @@ class Game:
             self.ms_elapsed = self.ms_elapsed + timepassed
             if(self.ms_elapsed >= conf.get()['game']['gametime'] and not self.demomode):
                 self.gameEndCode = conf.get()['codes']['time_up']
-            
             #Flip the framebuffers
-            self.app.repaint()
             self.app.update(self.screen)
             pygame.display.flip()
 
@@ -225,7 +228,8 @@ class Game:
                 self.requestSelected(None)
             self.aircraft.remove(a)
             self.cnt_fspane.remove(a.getFS())
-
+            self.cnt_fspane.repaint()
+        
         #4: Spawn new aircraft due for spawning (or if in demo, regenerate list if none left)
         if(len(self.aircraftspawntimes) != 0):
             if self.ms_elapsed >= self.aircraftspawntimes[0]:
@@ -240,7 +244,7 @@ class Game:
             self.ms_eleapsed = 0
             self.__generateAircraftSpawnEvents()
             print("reset")
-
+    
     def __handleUserInteraction(self):
 
         for event in pygame.event.get():

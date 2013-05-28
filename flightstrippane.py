@@ -44,6 +44,7 @@ class FlightStrip(gui.Container):
     def __slider_change(self):
         newspeed = self.sli_speed.value
         self.ac.setSpeed(newspeed)
+        self.repaint()
         
     def updateAllFields(self):
         self.l_id.value = self.ac.getIdent()
