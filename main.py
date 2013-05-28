@@ -1,3 +1,4 @@
+#!/usr/bin/env python
 #   File: main.py
 
 from pygame import *
